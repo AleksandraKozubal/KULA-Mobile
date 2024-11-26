@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Widgets/kebab_place_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,19 +31,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
         title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const KebabPlaceWidget()),
+              );
+            },
+          ),
+        ],
       ),
-      body: const Center(
-      ),
+      body: const Center(),
     );
   }
 }
