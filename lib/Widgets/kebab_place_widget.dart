@@ -29,7 +29,7 @@ class KebabPlaceWidget extends StatelessWidget {
           final kebabPlace = snapshot.data![index];
           return ListTile(
           title: Text(kebabPlace.name),
-          subtitle: Text(kebabPlace.street),
+          subtitle: Text('${kebabPlace.street} ${kebabPlace.buildingNumber}'),
           );
           },
           );

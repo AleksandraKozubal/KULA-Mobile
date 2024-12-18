@@ -13,8 +13,8 @@ class KebabPlaceModel {
   final String? phone;
   final String? website;
   final String? email;
-  final List<FillingModel>? fillings;
-  final List<SauceModel>? sauces;
+  final String? fillings;
+  final String? sauces;
   final String? image;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -43,19 +43,19 @@ class KebabPlaceModel {
       id: json['id'],
       name: json['name'],
       street: json['street'],
-      buildingNumber: json['building_number'],
-      latitude: json['latitude'],
-      longitude: json['longitude'],
-      googleMapsUrl: json['google_maps_url'],
-      googleMapsRating: json['google_maps_rating'],
-      phone: json['phone'],
-      website: json['website'],
-      email: json['email'],
-      fillings: json['fillings'],
-      sauces: json['sauces'],
-      image: json['image'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      buildingNumber: json['building_number'] ?? '',
+      latitude: json['latitude'] ?? '',
+      longitude: json['longitude'] ?? '',
+      googleMapsUrl: json['google_maps_url'] ?? '',
+      googleMapsRating: json['google_maps_rating'] ?? '',
+      phone: json['phone'] ?? '',
+      website: json['website'] ?? '',
+      email: json['email'] ?? '',
+      fillings: json ['fillings'] ?? '',
+      sauces: json['sauces'] ?? '',
+      image: json['image'] ?? '',
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
     );
   }
 
