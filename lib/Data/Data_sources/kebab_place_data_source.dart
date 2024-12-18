@@ -8,17 +8,18 @@ class KebabPlaceDataSource {
   final String? apiUrl = dotenv.env['API_URL'];
 
   Future<List<KebabPlaceModel>> getKebabPlaces() async {
-    final response = await http.get('$apiUrl/kebab-places' as Uri);
+        final response = await http.get(Uri.parse('$apiUrl/kebab-places'));
     if (response.statusCode == 200) {
-      List<dynamic> jsonList = json.decode(response.body);
-      return jsonList.map((json) => KebabPlaceModel.fromJson(json)).toList();
+      final jsonResponse = json.decode(response.body);
+      final List<dynamic> data = jsonResponse['data'];
+      return data.map((json) => KebabPlaceModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load kebab places');
     }
   }
 
   Future<KebabPlaceModel> getKebabPlace(int id) async {
-    final response = await http.get('$apiUrl/kebab-places/$id' as Uri);
+    final response = await http.get(Uri.parse('$apiUrl/kebab-places/$id'));
     if (response.statusCode == 200) {
       json.decode(response.body);
       return KebabPlaceModel.fromJson(json as Map<String, dynamic>);
@@ -26,6 +27,5 @@ class KebabPlaceDataSource {
       throw Exception('Failed to load kebab place');
     }
   }
-
 
 }

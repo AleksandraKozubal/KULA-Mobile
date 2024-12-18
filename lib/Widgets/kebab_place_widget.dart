@@ -13,30 +13,28 @@ class KebabPlaceWidget extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: const Text('Kebab Places'),
       ),
-      body: Center(
-        child: FutureBuilder<List<KebabPlaceModel>>(
-            future: KebabPlaceRepositoryImpl(KebabPlaceDataSource()).getKebabPlaces(),
-            builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Text('No kebab places found');
-            } else {
-            return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-            final kebabPlace = snapshot.data![index];
-            return ListTile(
-            title: Text(kebabPlace.name),
-            subtitle: Text(kebabPlace.street),
-            );
-            },
-            );
-            }
-            },
-        ),
+      body: FutureBuilder<List<KebabPlaceModel>>(
+          future: KebabPlaceRepositoryImpl(KebabPlaceDataSource()).getKebabPlaces(),
+          builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Text('No kebab places found');
+          } else {
+          return ListView.builder(
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+          final kebabPlace = snapshot.data![index];
+          return ListTile(
+          title: Text(kebabPlace.name),
+          subtitle: Text(kebabPlace.street),
+          );
+          },
+          );
+          }
+          },
       ),
     );
   }

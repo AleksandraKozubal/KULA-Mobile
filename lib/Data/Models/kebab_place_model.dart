@@ -1,38 +1,41 @@
+import 'package:kula_mobile/Data/Models/filling_model.dart';
+import 'package:kula_mobile/Data/Models/sauce_model.dart';
+
 class KebabPlaceModel {
   final int id;
   final String name;
   final String street;
-  final String buildingNumber;
-  final String latitude;
-  final String longitude;
-  final String googleMapsUrl;
-  final String googleMapsRating;
-  final String phone;
-  final String website;
-  final String email;
-  final String fillings;
-  final String sauces;
-  final String image;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? buildingNumber;
+  final String? latitude;
+  final String? longitude;
+  final String? googleMapsUrl;
+  final String? googleMapsRating;
+  final String? phone;
+  final String? website;
+  final String? email;
+  final List<FillingModel>? fillings;
+  final List<SauceModel>? sauces;
+  final String? image;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   KebabPlaceModel({
     required this.id,
     required this.name,
     required this.street,
-    required this.buildingNumber,
-    required this.latitude,
-    required this.longitude,
-    required this.googleMapsUrl,
-    required this.googleMapsRating,
-    required this.phone,
-    required this.website,
-    required this.email,
-    required this.fillings,
-    required this.sauces,
-    required this.image,
-    required this.createdAt,
-    required this.updatedAt,
+    this.buildingNumber,
+    this.latitude,
+    this.longitude,
+    this.googleMapsUrl,
+    this.googleMapsRating,
+    this.phone,
+    this.website,
+    this.email,
+    this.fillings,
+    this.sauces,
+    this.image,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory KebabPlaceModel.fromJson(Map<String, dynamic> json) {
@@ -72,8 +75,8 @@ class KebabPlaceModel {
       'fillings': fillings,
       'sauces': sauces,
       'image': image,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
     };
   }
 }
