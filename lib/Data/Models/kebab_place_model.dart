@@ -51,7 +51,7 @@ class KebabPlaceModel {
       phone: json['phone'] ?? '',
       website: json['website'] ?? '',
       email: json['email'] ?? '',
-      fillings: json ['fillings'] ?? '',
+      fillings: json['fillings'] ?? '',
       sauces: json['sauces'] ?? '',
       image: json['image'] ?? '',
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
