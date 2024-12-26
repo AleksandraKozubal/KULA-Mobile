@@ -27,8 +27,12 @@ class SauceModel {
       isVegan: json['is_vegan'] == '1',
       isGlutenFree: json['is_gluten_free'] == '1',
       hexColor: json['hex_color'],
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : null,
     );
   }
 
@@ -44,5 +48,4 @@ class SauceModel {
       'updated_at': updatedAt?.toIso8601String(),
     };
   }
-  
 }

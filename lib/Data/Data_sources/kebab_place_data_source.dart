@@ -27,5 +27,4 @@ class KebabPlaceDataSource {
       throw Exception('Failed to load kebab place');
     }
   }
-
 }

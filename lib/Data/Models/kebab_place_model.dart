@@ -1,6 +1,3 @@
-import 'package:kula_mobile/Data/Models/filling_model.dart';
-import 'package:kula_mobile/Data/Models/sauce_model.dart';
-
 class KebabPlaceModel {
   final int id;
   final String name;
@@ -54,8 +51,12 @@ class KebabPlaceModel {
       fillings: json['fillings'] ?? '',
       sauces: json['sauces'] ?? '',
       image: json['image'] ?? '',
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : null,
     );
   }
 

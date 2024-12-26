@@ -4,7 +4,7 @@ import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
 import 'package:kula_mobile/Data/Repositories/kebab_place_repository_impl.dart';
 
 class KebabPlaceWidget extends StatelessWidget {
-  const KebabPlaceWidget({Key? key}) : super(key: key);
+  const KebabPlaceWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,27 +14,31 @@ class KebabPlaceWidget extends StatelessWidget {
         title: const Text('Kebab Places'),
       ),
       body: FutureBuilder<List<KebabPlaceModel>>(
-          future: KebabPlaceRepositoryImpl(KebabPlaceDataSource()).getKebabPlaces(),
-          builder: (context, snapshot) {
+        future:
+            KebabPlaceRepositoryImpl(KebabPlaceDataSource()).getKebabPlaces(),
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+            return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+            return Text('Error: ${snapshot.error}');
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Text('No kebab places found');
+            return const Text('No kebab places found');
           } else {
-          return ListView.builder(
-          itemCount: snapshot.data!.length,
-          itemBuilder: (context, index) {
-          final kebabPlace = snapshot.data![index];
-          return ListTile(
-          title: Text(kebabPlace.name),
-          subtitle: Text('${kebabPlace.street} ${kebabPlace.buildingNumber}'),
-          );
-          },
-          );
+            return ListView.separated(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final kebabPlace = snapshot.data![index];
+                return ListTile(
+                  leading: const Icon(Icons.fastfood, size: 50.0),
+                  title: Text(kebabPlace.name),
+                  subtitle:
+                      Text('${kebabPlace.street} ${kebabPlace.buildingNumber}'),
+                );
+              },
+              separatorBuilder: (context, index) => const Divider(),
+            );
           }
-          },
+        },
       ),
     );
   }
