@@ -12,6 +12,9 @@ class KebabPlaceModel {
   final String? email;
   final String? fillings;
   final String? sauces;
+  final String? openingHours;
+  final String? yearEstablished;
+  final bool? isKraft;
   final String? image;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -30,6 +33,9 @@ class KebabPlaceModel {
     this.email,
     this.fillings,
     this.sauces,
+    this.openingHours,
+    this.yearEstablished,
+    this.isKraft,
     this.image,
     this.createdAt,
     this.updatedAt,
@@ -50,6 +56,9 @@ class KebabPlaceModel {
       email: json['email'] ?? '',
       fillings: json['fillings'] ?? '',
       sauces: json['sauces'] ?? '',
+      openingHours: json['opening_hours'] ?? '',
+      yearEstablished: json['year_of_establishment'] ?? '',
+      isKraft: json['is_kraft'] ?? false,
       image: json['image'] ?? '',
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
@@ -75,6 +84,9 @@ class KebabPlaceModel {
       'email': email,
       'fillings': fillings,
       'sauces': sauces,
+      'opening_hours': openingHours,
+      'year_established': yearEstablished,
+      'is_kraft': isKraft,
       'image': image,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
