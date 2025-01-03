@@ -82,12 +82,12 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Kebab Places'),
+        title: const Text('Kebaby w okolicy'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child:
-                BadgeWidget(text: 'Total: $_totalKebabs', color: Colors.white),
+                BadgeWidget(text: 'Razem: $_totalKebabs', color: Colors.white),
           ),
         ],
       ),
@@ -138,7 +138,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                   ],
                                   if (kebabPlace.isKraft == true) ...[
                                     const BadgeWidget(
-                                      text: 'Craft',
+                                      text: 'Kraft',
                                       color: Colors.purple,
                                     ),
                                     const SizedBox(width: 8.0),
@@ -146,7 +146,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                   if (kebabPlace.yearEstablished != null)
                                     BadgeWidget(
                                       text:
-                                          'Since ${kebabPlace.yearEstablished}',
+                                          'Od ${kebabPlace.yearEstablished}',
                                       color: Colors.deepOrangeAccent,
                                     ),
                                 ],
@@ -169,7 +169,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                         child: const Icon(Icons.arrow_back),
                       ),
                       BadgeWidget(
-                        text: 'Page $_currentPage / $_totalPages',
+                        text: 'Strona $_currentPage / $_totalPages',
                         color: Colors.black,
                       ),
                       ElevatedButton(
