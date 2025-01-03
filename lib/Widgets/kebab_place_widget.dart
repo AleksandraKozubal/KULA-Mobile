@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:kula_mobile/Data/Data_sources/kebab_place_data_source.dart';
 import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
 import 'package:kula_mobile/Data/Repositories/kebab_place_repository_impl.dart';
@@ -9,10 +10,10 @@ class KebabPlaceWidget extends StatefulWidget {
   const KebabPlaceWidget({super.key});
 
   @override
-  _KebabPlaceWidgetState createState() => _KebabPlaceWidgetState();
+  KebabPlaceWidgetState createState() => KebabPlaceWidgetState();
 }
 
-class _KebabPlaceWidgetState extends State<KebabPlaceWidget> {
+class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
   List<KebabPlaceModel> _kebabPlaces = [];
   bool _isLoading = true;
   int _currentPage = 1;
@@ -27,24 +28,30 @@ class _KebabPlaceWidgetState extends State<KebabPlaceWidget> {
 
   Future<void> _fetchKebabPlaces() async {
     try {
-      final response = await KebabPlaceRepositoryImpl(KebabPlaceDataSource())
-          .getKebabPlaces(page: _currentPage);
-      final data = await response;
+      final response = await KebabPlaceRepositoryImpl(
+        KebabPlaceDataSource(client: http.Client()),
+      ).getKebabPlaces(page: _currentPage);
+
       setState(() {
         if (_currentPage == 1) {
-          _kebabPlaces = data['data'];
+          _kebabPlaces = response['data'];
         } else {
-          _kebabPlaces.addAll(data['data']);
+          _kebabPlaces.addAll(response['data']);
         }
         _isLoading = false;
-        _totalPages = data['last_page'];
-        _totalKebabs = data['total'];
+        _totalPages = response['last_page'];
+        _totalKebabs = response['total'];
       });
     } catch (error) {
       setState(() {
         _isLoading = false;
       });
-      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to load kebab places'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -53,7 +60,7 @@ class _KebabPlaceWidgetState extends State<KebabPlaceWidget> {
       setState(() {
         _currentPage--;
         _isLoading = true;
-        _kebabPlaces.clear(); // Clear the list to avoid duplicates
+        _kebabPlaces.clear();
       });
       _fetchKebabPlaces();
     }
@@ -64,7 +71,7 @@ class _KebabPlaceWidgetState extends State<KebabPlaceWidget> {
       setState(() {
         _currentPage++;
         _isLoading = true;
-        _kebabPlaces.clear(); // Clear the list to avoid duplicates
+        _kebabPlaces.clear();
       });
       _fetchKebabPlaces();
     }
@@ -108,14 +115,16 @@ class _KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                  '${kebabPlace.street} ${kebabPlace.buildingNumber}'),
+                                '${kebabPlace.street} ${kebabPlace.buildingNumber}',
+                              ),
                               const SizedBox(height: 4.0),
                               Row(
                                 children: [
                                   if (kebabPlace.googleMapsRating != null) ...[
                                     RatingBarIndicator(
                                       rating: double.parse(
-                                          kebabPlace.googleMapsRating!),
+                                        kebabPlace.googleMapsRating!,
+                                      ),
                                       itemBuilder: (context, index) =>
                                           const Icon(
                                         Icons.star,
@@ -160,8 +169,9 @@ class _KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                         child: const Icon(Icons.arrow_back),
                       ),
                       BadgeWidget(
-                          text: 'Page $_currentPage / $_totalPages',
-                          color: Colors.black),
+                        text: 'Page $_currentPage / $_totalPages',
+                        color: Colors.black,
+                      ),
                       ElevatedButton(
                         onPressed: _nextPage,
                         child: const Icon(Icons.arrow_forward),

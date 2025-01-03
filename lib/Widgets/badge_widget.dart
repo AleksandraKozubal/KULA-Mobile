@@ -4,7 +4,7 @@ class BadgeWidget extends StatelessWidget {
   final String text;
   final Color color;
 
-  const BadgeWidget({super.key, required this.text, required this.color});
+  const BadgeWidget({required this.text, required this.color, super.key});
 
   @override
   Widget build(BuildContext context) {

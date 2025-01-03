@@ -4,11 +4,14 @@ import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
 import 'package:http/http.dart' as http;
 
 class KebabPlaceDataSource {
+  final http.Client client;
   final String? apiUrl = dotenv.env['API_URL'];
+
+  KebabPlaceDataSource({required this.client});
 
   Future<Map<String, dynamic>> getKebabPlaces({int page = 1}) async {
     final response =
-        await http.get(Uri.parse('$apiUrl/kebab-places?page=$page'));
+        await client.get(Uri.parse('$apiUrl/kebab-places?page=$page'));
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       final List<dynamic> data = jsonResponse['data'];
@@ -26,7 +29,7 @@ class KebabPlaceDataSource {
   }
 
   Future<KebabPlaceModel> getKebabPlace(int id) async {
-    final response = await http.get(Uri.parse('$apiUrl/kebab-places/$id'));
+    final response = await client.get(Uri.parse('$apiUrl/kebab-places/$id'));
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return KebabPlaceModel.fromJson(jsonResponse);
