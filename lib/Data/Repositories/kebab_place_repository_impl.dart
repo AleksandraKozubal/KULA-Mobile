@@ -6,8 +6,9 @@ class KebabPlaceRepositoryImpl {
 
   KebabPlaceRepositoryImpl(this._dataSource);
 
-  Future<List<KebabPlaceModel>> getKebabPlaces() async {
-    return _dataSource.getKebabPlaces();
+  Future<Future<Map<String, dynamic>>> getKebabPlaces(
+      {required int page}) async {
+    return _dataSource.getKebabPlaces(page: page);
   }
 
   Future<KebabPlaceModel> getKebabPlace(int id) async {

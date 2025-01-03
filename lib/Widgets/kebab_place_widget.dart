@@ -2,10 +2,73 @@ import 'package:flutter/material.dart';
 import 'package:kula_mobile/Data/Data_sources/kebab_place_data_source.dart';
 import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
 import 'package:kula_mobile/Data/Repositories/kebab_place_repository_impl.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'badge_widget.dart';
 
-class KebabPlaceWidget extends StatelessWidget {
-  const KebabPlaceWidget({Key? key}) : super(key: key);
+class KebabPlaceWidget extends StatefulWidget {
+  const KebabPlaceWidget({super.key});
+
+  @override
+  _KebabPlaceWidgetState createState() => _KebabPlaceWidgetState();
+}
+
+class _KebabPlaceWidgetState extends State<KebabPlaceWidget> {
+  List<KebabPlaceModel> _kebabPlaces = [];
+  bool _isLoading = true;
+  int _currentPage = 1;
+  int _totalPages = 1;
+  int _totalKebabs = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchKebabPlaces();
+  }
+
+  Future<void> _fetchKebabPlaces() async {
+    try {
+      final response = await KebabPlaceRepositoryImpl(KebabPlaceDataSource())
+          .getKebabPlaces(page: _currentPage);
+      final data = await response;
+      setState(() {
+        if (_currentPage == 1) {
+          _kebabPlaces = data['data'];
+        } else {
+          _kebabPlaces.addAll(data['data']);
+        }
+        _isLoading = false;
+        _totalPages = data['last_page'];
+        _totalKebabs = data['total'];
+      });
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      // Handle error
+    }
+  }
+
+  void _previousPage() {
+    if (_currentPage > 1) {
+      setState(() {
+        _currentPage--;
+        _isLoading = true;
+        _kebabPlaces.clear(); // Clear the list to avoid duplicates
+      });
+      _fetchKebabPlaces();
+    }
+  }
+
+  void _nextPage() {
+    if (_currentPage < _totalPages) {
+      setState(() {
+        _currentPage++;
+        _isLoading = true;
+        _kebabPlaces.clear(); // Clear the list to avoid duplicates
+      });
+      _fetchKebabPlaces();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,53 +76,101 @@ class KebabPlaceWidget extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Kebab Places'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child:
+                BadgeWidget(text: 'Total: $_totalKebabs', color: Colors.white),
+          ),
+        ],
       ),
-      body: FutureBuilder<List<KebabPlaceModel>>(
-        future: KebabPlaceRepositoryImpl(KebabPlaceDataSource()).getKebabPlaces(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No kebab places found'));
-          } else {
-            return ListView.separated(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final kebabPlace = snapshot.data![index];
-                return ListTile(
-                  leading: const Icon(Icons.fastfood, size: 50.0),
-                  title: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      kebabPlace.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('${kebabPlace.street} ${kebabPlace.buildingNumber}'),
-                        const SizedBox(height: 4.0),
-                        Row(
-                          children: [
-                            if  (kebabPlace.isKraft!) ... [const BadgeWidget(text: 'Kraft', color: Colors.purple), const SizedBox(width: 8.0)],
-                            if (kebabPlace.yearEstablished != null) ... [BadgeWidget(text: 'Since ${kebabPlace.yearEstablished}', color: Colors.orangeAccent), ]
-                          ],
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: _kebabPlaces.length,
+                    itemBuilder: (context, index) {
+                      final kebabPlace = _kebabPlaces[index];
+                      return ListTile(
+                        leading: const Icon(Icons.fastfood, size: 50.0),
+                        title: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            kebabPlace.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ],
-                    ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  '${kebabPlace.street} ${kebabPlace.buildingNumber}'),
+                              const SizedBox(height: 4.0),
+                              Row(
+                                children: [
+                                  if (kebabPlace.googleMapsRating != null) ...[
+                                    RatingBarIndicator(
+                                      rating: double.parse(
+                                          kebabPlace.googleMapsRating!),
+                                      itemBuilder: (context, index) =>
+                                          const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                      itemCount: 5,
+                                      itemSize: 20.0,
+                                      direction: Axis.horizontal,
+                                    ),
+                                    const SizedBox(width: 8.0),
+                                  ],
+                                  if (kebabPlace.isKraft == true) ...[
+                                    const BadgeWidget(
+                                      text: 'Craft',
+                                      color: Colors.purple,
+                                    ),
+                                    const SizedBox(width: 8.0),
+                                  ],
+                                  if (kebabPlace.yearEstablished != null)
+                                    BadgeWidget(
+                                      text:
+                                          'Since ${kebabPlace.yearEstablished}',
+                                      color: Colors.deepOrangeAccent,
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, index) => const Divider(),
                   ),
-                );
-              },
-              separatorBuilder: (context, index) => const Divider(),
-            );
-          }
-        },
-      ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _previousPage,
+                        child: const Icon(Icons.arrow_back),
+                      ),
+                      BadgeWidget(
+                          text: 'Page $_currentPage / $_totalPages',
+                          color: Colors.black),
+                      ElevatedButton(
+                        onPressed: _nextPage,
+                        child: const Icon(Icons.arrow_forward),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }
