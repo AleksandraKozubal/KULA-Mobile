@@ -4,6 +4,7 @@ import 'package:kula_mobile/Data/Data_sources/kebab_place_data_source.dart';
 import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
 import 'package:kula_mobile/Data/Repositories/kebab_place_repository_impl.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:kula_mobile/Widgets/kebab_place_details_widget.dart';
 import 'badge_widget.dart';
 
 class KebabPlaceWidget extends StatefulWidget {
@@ -31,7 +32,6 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
       final response = await KebabPlaceRepositoryImpl(
         KebabPlaceDataSource(client: http.Client()),
       ).getKebabPlaces(page: _currentPage);
-
       setState(() {
         if (_currentPage == 1) {
           _kebabPlaces = response['data'];
@@ -145,8 +145,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                   ],
                                   if (kebabPlace.yearEstablished != null)
                                     BadgeWidget(
-                                      text:
-                                          'Od ${kebabPlace.yearEstablished}',
+                                      text: 'Od ${kebabPlace.yearEstablished}',
                                       color: Colors.deepOrangeAccent,
                                     ),
                                 ],
@@ -154,6 +153,15 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             ],
                           ),
                         ),
+                        onTap: () {
+                          Navigator.push(context,
+                            MaterialPageRoute(
+                              builder: (context) => KebabPlaceDetailsWidget(
+                                kebabPlace: kebabPlace,
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                     separatorBuilder: (context, index) => const Divider(),
