@@ -56,6 +56,7 @@
         <intent>
             <action android:name="android.intent.action.VIEw"/>
             <data android:scheme="email"/>
+        </intent>
         <intent>
             <action android:name="android.support.customtabs.action.CustomTabsService"/>
         </intent>

@@ -27,6 +27,11 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
     _fetchKebabPlaces();
   }
 
+  @override
+    void dispose() {
+        super.dispose();
+    }
+
   Future<void> _fetchKebabPlaces() async {
     try {
       final response = await KebabPlaceRepositoryImpl(
