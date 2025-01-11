@@ -120,7 +120,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${kebabPlace.street} ${kebabPlace.buildingNumber}',
+                                kebabPlace.address,
                               ),
                               const SizedBox(height: 4.0),
                               Row(
@@ -141,16 +141,16 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                     ),
                                     const SizedBox(width: 8.0),
                                   ],
-                                  if (kebabPlace.isKraft == true) ...[
+                                  if (kebabPlace.isCraft == true) ...[
                                     const BadgeWidget(
                                       text: 'Kraft',
                                       color: Colors.purple,
                                     ),
                                     const SizedBox(width: 8.0),
                                   ],
-                                  if (kebabPlace.yearEstablished != null)
+                                  if (kebabPlace.openedAtYear != null)
                                     BadgeWidget(
-                                      text: 'Od ${kebabPlace.yearEstablished}',
+                                      text: 'Od ${kebabPlace.openedAtYear}',
                                       color: Colors.deepOrangeAccent,
                                     ),
                                 ],
