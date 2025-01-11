@@ -7,7 +7,7 @@ void main() {
       final json = {
         'id': 1,
         'name': 'Hot Sauce',
-        'spiciness': 5,
+        'spiciness': '5',
         'is_vegan': '1',
         'is_gluten_free': '0',
         'hex_color': '#FF5733',
@@ -19,7 +19,7 @@ void main() {
 
       expect(sauce.id, 1);
       expect(sauce.name, 'Hot Sauce');
-      expect(sauce.spiciness, 5);
+      expect(sauce.spiciness, '5');
       expect(sauce.isVegan, true);
       expect(sauce.isGlutenFree, false);
       expect(sauce.hexColor, '#FF5733');
@@ -31,7 +31,7 @@ void main() {
       final sauce = SauceModel(
         id: 1,
         name: 'Hot Sauce',
-        spiciness: 5,
+        spiciness: '5',
         isVegan: true,
         isGlutenFree: false,
         hexColor: '#FF5733',
@@ -43,7 +43,7 @@ void main() {
 
       expect(json['id'], 1);
       expect(json['name'], 'Hot Sauce');
-      expect(json['spiciness'], 5);
+      expect(json['spiciness'], '5');
       expect(json['is_vegan'], '1');
       expect(json['is_gluten_free'], '0');
       expect(json['hex_color'], '#FF5733');
@@ -55,7 +55,7 @@ void main() {
       final json = {
         'id': 2,
         'name': 'Mild Sauce',
-        'spiciness': 2,
+        'spiciness': '2',
         'is_vegan': '0',
         'is_gluten_free': '1',
         'hex_color': '#00FF00',
@@ -67,7 +67,7 @@ void main() {
 
       expect(sauce.id, 2);
       expect(sauce.name, 'Mild Sauce');
-      expect(sauce.spiciness, 2);
+      expect(sauce.spiciness, '2');
       expect(sauce.isVegan, false);
       expect(sauce.isGlutenFree, true);
       expect(sauce.hexColor, '#00FF00');
@@ -79,7 +79,7 @@ void main() {
       final sauce = SauceModel(
         id: 2,
         name: 'Mild Sauce',
-        spiciness: 2,
+        spiciness: '2',
         isVegan: false,
         isGlutenFree: true,
         hexColor: '#00FF00',
@@ -91,7 +91,7 @@ void main() {
 
       expect(json['id'], 2);
       expect(json['name'], 'Mild Sauce');
-      expect(json['spiciness'], 2);
+      expect(json['spiciness'], '2');
       expect(json['is_vegan'], '0');
       expect(json['is_gluten_free'], '1');
       expect(json['hex_color'], '#00FF00');

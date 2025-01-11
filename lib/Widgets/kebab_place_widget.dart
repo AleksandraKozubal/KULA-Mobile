@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:kula_mobile/Data/Data_sources/kebab_place_data_source.dart';
 import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
+import 'package:kula_mobile/Data/Repositories/filling_repository_impl.dart';
 import 'package:kula_mobile/Data/Repositories/kebab_place_repository_impl.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:kula_mobile/Data/Repositories/sauce_repository_impl.dart';
 import 'package:kula_mobile/Widgets/kebab_place_details_widget.dart';
+import 'package:kula_mobile/Data/Data_sources/filling_data_source.dart';
+import 'package:kula_mobile/Data/Data_sources/sauce_data_source.dart';
 import 'badge_widget.dart';
 
 class KebabPlaceWidget extends StatefulWidget {
@@ -28,9 +32,9 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
   }
 
   @override
-    void dispose() {
-        super.dispose();
-    }
+  void dispose() {
+    super.dispose();
+  }
 
   Future<void> _fetchKebabPlaces() async {
     try {
@@ -159,10 +163,17 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                           ),
                         ),
                         onTap: () {
-                          Navigator.push(context,
+                          Navigator.push(
+                            context,
                             MaterialPageRoute(
                               builder: (context) => KebabPlaceDetailsWidget(
                                 kebabPlace: kebabPlace,
+                                fillingRepository: FillingRepositoryImpl(
+                                  FillingDataSource(client: http.Client()),
+                                ),
+                                sauceRepository: SauceRepositoryImpl(
+                                  SauceDataSource(client: http.Client()),
+                                ),
                               ),
                             ),
                           );
@@ -183,7 +194,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                       ),
                       BadgeWidget(
                         text: 'Strona $_currentPage / $_totalPages',
-                        color: Colors.black,
+                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
                       ),
                       ElevatedButton(
                         onPressed: _nextPage,

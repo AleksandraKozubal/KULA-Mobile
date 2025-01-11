@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class KebabPlaceModel {
   final int id;
   final String name;
@@ -35,6 +33,8 @@ class KebabPlaceModel {
     required this.locationType,
     required this.orderOptions,
     required this.socialMedia,
+    required this.fillings,
+    required this.sauces,
     this.image,
     this.latitude,
     this.longitude,
@@ -45,8 +45,6 @@ class KebabPlaceModel {
     this.email,
     this.openedAtYear,
     this.closedAtYear,
-    required this.fillings,
-    required this.sauces,
     this.isCraft,
     this.isChainRestaurant,
     this.createdAt,
@@ -59,7 +57,10 @@ class KebabPlaceModel {
       name: json['name'],
       address: json['address'],
       openingHours: json['opening_hours'] != null
-          ? List<Map<String, dynamic>>.from(json['opening_hours'].map((item) => Map<String, dynamic>.from(item)))
+          ? List<Map<String, dynamic>>.from(
+              json['opening_hours']
+                  .map((item) => Map<String, dynamic>.from(item)),
+            )
           : [],
       status: json['status'],
       locationType: json['location_type'],
@@ -67,7 +68,10 @@ class KebabPlaceModel {
           ? List<String>.from(json['order_options'])
           : [],
       socialMedia: json['social_media'] != null
-          ? List<Map<String, dynamic>>.from(json['social_media'].map((item) => Map<String, dynamic>.from(item)))
+          ? List<Map<String, dynamic>>.from(
+              json['social_media']
+                  .map((item) => Map<String, dynamic>.from(item)),
+            )
           : [],
       image: json['image'],
       latitude: json['latitude'],
@@ -79,12 +83,9 @@ class KebabPlaceModel {
       email: json['email'],
       openedAtYear: json['opened_at_year'],
       closedAtYear: json['closed_at_year'],
-      fillings: json['fillings'] != null
-          ? List<String>.from(json['fillings'])
-          : [],
-      sauces: json['sauces'] != null
-          ? List<int>.from(json['sauces'])
-          : [],
+      fillings:
+          json['fillings'] != null ? List<String>.from(json['fillings']) : [],
+      sauces: json['sauces'] != null ? List<int>.from(json['sauces']) : [],
       isCraft: json['is_craft'],
       isChainRestaurant: json['is_chain_restaurant'],
       createdAt: json['created_at'] != null
