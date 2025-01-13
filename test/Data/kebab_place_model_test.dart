@@ -73,7 +73,7 @@ void main() {
         phone: '1234567890',
         website: 'http://test.com',
         email: 'test@test.com',
-        fillings: ['Test fillings'],
+        fillings: [1],
         sauces: [1, 2, 3],
         openingHours: [
           {'day': 'Poniedzialek', 'from': '07:00', 'to': '20:00'},
@@ -102,7 +102,7 @@ void main() {
       expect(json['phone'], '1234567890');
       expect(json['website'], 'http://test.com');
       expect(json['email'], 'test@test.com');
-      expect(json['fillings'], ['Test fillings']);
+      expect(json['fillings'], [1]);
       expect(json['sauces'], [1, 2, 3]);
       expect(json['opening_hours'], [
         {'day': 'Poniedzialek', 'from': '07:00', 'to': '20:00'},

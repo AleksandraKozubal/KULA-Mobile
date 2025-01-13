@@ -237,7 +237,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                             spacing: 8.0,
                             children:
                                 widget.kebabPlace.fillings.map((fillingId) {
-                              final filling = fillingsMap[int.parse(fillingId)];
+                              final filling = fillingsMap[fillingId];
                               final fillingName = filling?['name'] ?? 'Unknown';
                               final fillingColor = filling?['hexColor'] != null
                                   ? Color(int.parse(
