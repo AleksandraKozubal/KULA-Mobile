@@ -15,7 +15,7 @@ void main() {
         'phone': '1234567890',
         'website': 'http://test.com',
         'email': 'test@test.com',
-        'fillings': ['Test fillings'],
+        'fillings': [1, 2, 3],
         'sauces': [1, 2, 3],
         'opening_hours': [
           {'day': 'Poniedzialek', 'from': '07:00', 'to': '20:00'},
@@ -24,7 +24,7 @@ void main() {
         'location_type': 'restaurant',
         'order_options': ['dine-in', 'takeaway'],
         'social_media': [
-          {'Name': 'Facebook', 'url': 'http://facebook.com/test'},
+          {'name': 'Facebook', 'url': 'http://facebook.com/test'},
         ],
         'is_craft': true,
         'image': 'http://test.com/image.jpg',
@@ -44,7 +44,7 @@ void main() {
       expect(kebabPlace.phone, '1234567890');
       expect(kebabPlace.website, 'http://test.com');
       expect(kebabPlace.email, 'test@test.com');
-      expect(kebabPlace.fillings, ['Test fillings']);
+      expect(kebabPlace.fillings, [1, 2, 3]);
       expect(kebabPlace.sauces, [1, 2, 3]);
       expect(kebabPlace.openingHours, [
         {'day': 'Poniedzialek', 'from': '07:00', 'to': '20:00'},
@@ -53,7 +53,7 @@ void main() {
       expect(kebabPlace.locationType, 'restaurant');
       expect(kebabPlace.orderOptions, ['dine-in', 'takeaway']);
       expect(kebabPlace.socialMedia, [
-        {'Name': 'Facebook', 'url': 'http://facebook.com/test'},
+        {'name': 'Facebook', 'url': 'http://facebook.com/test'},
       ]);
       expect(kebabPlace.isCraft, true);
       expect(kebabPlace.image, 'http://test.com/image.jpg');
@@ -73,7 +73,7 @@ void main() {
         phone: '1234567890',
         website: 'http://test.com',
         email: 'test@test.com',
-        fillings: [1],
+        fillings: [1, 2, 3],
         sauces: [1, 2, 3],
         openingHours: [
           {'day': 'Poniedzialek', 'from': '07:00', 'to': '20:00'},
@@ -82,7 +82,7 @@ void main() {
         locationType: 'restaurant',
         orderOptions: ['dine-in', 'takeaway'],
         socialMedia: [
-          {'Name': 'Facebook', 'url': 'http://facebook.com/test'},
+          {'name': 'Facebook', 'url': 'http://facebook.com/test'},
         ],
         isCraft: true,
         image: 'http://test.com/image.jpg',
@@ -102,7 +102,7 @@ void main() {
       expect(json['phone'], '1234567890');
       expect(json['website'], 'http://test.com');
       expect(json['email'], 'test@test.com');
-      expect(json['fillings'], [1]);
+      expect(json['fillings'], [1, 2, 3]);
       expect(json['sauces'], [1, 2, 3]);
       expect(json['opening_hours'], [
         {'day': 'Poniedzialek', 'from': '07:00', 'to': '20:00'},
@@ -111,7 +111,7 @@ void main() {
       expect(json['location_type'], 'restaurant');
       expect(json['order_options'], ['dine-in', 'takeaway']);
       expect(json['social_media'], [
-        {'Name': 'Facebook', 'url': 'http://facebook.com/test'},
+        {'name': 'Facebook', 'url': 'http://facebook.com/test'},
       ]);
       expect(json['is_craft'], true);
       expect(json['image'], 'http://test.com/image.jpg');
