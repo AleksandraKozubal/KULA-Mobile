@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:kula_mobile/Data/Data_sources/kebab_place_data_source.dart';
 import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
+import 'package:kula_mobile/Data/Repositories/filling_repository_impl.dart';
 import 'package:kula_mobile/Data/Repositories/kebab_place_repository_impl.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:kula_mobile/Data/Repositories/sauce_repository_impl.dart';
+import 'package:kula_mobile/Widgets/kebab_place_details_widget.dart';
+import 'package:kula_mobile/Data/Data_sources/filling_data_source.dart';
+import 'package:kula_mobile/Data/Data_sources/sauce_data_source.dart';
 import 'badge_widget.dart';
 
 class KebabPlaceWidget extends StatefulWidget {
@@ -26,12 +31,16 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
     _fetchKebabPlaces();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _fetchKebabPlaces() async {
     try {
       final response = await KebabPlaceRepositoryImpl(
         KebabPlaceDataSource(client: http.Client()),
       ).getKebabPlaces(page: _currentPage);
-
       setState(() {
         if (_currentPage == 1) {
           _kebabPlaces = response['data'];
@@ -115,7 +124,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${kebabPlace.street} ${kebabPlace.buildingNumber}',
+                                kebabPlace.address,
                               ),
                               const SizedBox(height: 4.0),
                               Row(
@@ -136,17 +145,16 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                     ),
                                     const SizedBox(width: 8.0),
                                   ],
-                                  if (kebabPlace.isKraft == true) ...[
+                                  if (kebabPlace.isCraft == true) ...[
                                     const BadgeWidget(
                                       text: 'Kraft',
                                       color: Colors.purple,
                                     ),
                                     const SizedBox(width: 8.0),
                                   ],
-                                  if (kebabPlace.yearEstablished != null)
+                                  if (kebabPlace.openedAtYear != null)
                                     BadgeWidget(
-                                      text:
-                                          'Od ${kebabPlace.yearEstablished}',
+                                      text: 'Od ${kebabPlace.openedAtYear}',
                                       color: Colors.deepOrangeAccent,
                                     ),
                                 ],
@@ -154,6 +162,22 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             ],
                           ),
                         ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => KebabPlaceDetailsWidget(
+                                kebabPlace: kebabPlace,
+                                fillingRepository: FillingRepositoryImpl(
+                                  FillingDataSource(client: http.Client()),
+                                ),
+                                sauceRepository: SauceRepositoryImpl(
+                                  SauceDataSource(client: http.Client()),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                     separatorBuilder: (context, index) => const Divider(),
@@ -170,7 +194,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                       ),
                       BadgeWidget(
                         text: 'Strona $_currentPage / $_totalPages',
-                        color: Colors.black,
+                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
                       ),
                       ElevatedButton(
                         onPressed: _nextPage,

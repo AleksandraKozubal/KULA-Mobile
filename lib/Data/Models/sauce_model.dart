@@ -1,7 +1,7 @@
 class SauceModel {
   final int id;
   final String name;
-  final int spiciness;
+  final String spiciness;
   final bool isVegan;
   final bool isGlutenFree;
   final String? hexColor;
