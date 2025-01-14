@@ -118,8 +118,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                   ],
                   BadgeWidget(
                     text: widget.kebabPlace.isChainRestaurant == true
-                        ? 'Restauracja'
-                        : 'Food Truck',
+                        ? 'Lokal'
+                        : 'Buda',
                     color: Colors.blue,
                   ),
                 ],
