@@ -6,6 +6,7 @@ import 'package:kula_mobile/Data/Repositories/sauce_repository_impl.dart';
 import 'package:kula_mobile/Widgets/badge_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:social_media_buttons/social_media_buttons.dart';
+import 'tiktok_social_media_button.dart';
 
 class KebabPlaceDetailsWidget extends StatefulWidget {
   final KebabPlaceModel kebabPlace;
@@ -197,7 +198,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                           GestureDetector(
                             onTap: () => _launchURL(widget.kebabPlace.website!),
                             child: Text(
-                              widget.kebabPlace.website!,
+                              'Strona internetowa',
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
                                 decoration: TextDecoration.underline,
@@ -247,7 +248,9 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Row(
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
                         children:
                             widget.kebabPlace.socialMedia.map<Widget>((social) {
                           switch (social['name']) {
@@ -257,17 +260,24 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                 size: 30,
                                 color: Theme.of(context).iconTheme.color,
                               );
-                            case 'instagram':
+                            case 'ig':
                               return SocialMediaButton.instagram(
                                 url: social['url']!,
                                 size: 30,
                                 color: Theme.of(context).iconTheme.color,
                               );
-                            case 'twitter':
+                            case 'x':
                               return SocialMediaButton.twitter(
                                 url: social['url']!,
                                 size: 30,
                                 color: Theme.of(context).iconTheme.color,
+                              );
+                            case 'tt':
+                              return TikTokSocialMediaButton(
+                                url: social['url']!,
+                                size: 30,
+                                color: Theme.of(context).iconTheme.color ??
+                                    Colors.black,
                               );
                             default:
                               return Container();
@@ -284,6 +294,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8.0,
+                        runSpacing: 8.0,
                         children: widget.kebabPlace.orderOptions.map((option) {
                           return BadgeWidget(
                             text: option,
@@ -368,6 +379,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                 const SizedBox(height: 8),
                                 Wrap(
                                   spacing: 8.0,
+                                  runSpacing: 8.0,
                                   children: widget.kebabPlace.fillings
                                       .map((fillingId) {
                                     final filling = fillingsMap[fillingId];
@@ -418,6 +430,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                 const SizedBox(height: 8),
                                 Wrap(
                                   spacing: 8.0,
+                                  runSpacing: 8.0,
                                   children:
                                       widget.kebabPlace.sauces.map((sauceId) {
                                     final sauce = saucesMap[sauceId];
