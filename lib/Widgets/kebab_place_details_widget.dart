@@ -65,348 +65,361 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
       appBar: AppBar(
         title: Text(widget.kebabPlace.name),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.kebabPlace.name,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(widget.kebabPlace.address),
-              const SizedBox(height: 8),
-              if (widget.kebabPlace.googleMapsRating != null)
-                Row(
+      body: FutureBuilder(
+        future: Future.wait([fillingsFuture, saucesFuture]),
+        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            final fillingsMap = snapshot.data![0] as Map<int, Map<String, String?>>;
+            final saucesMap = snapshot.data![1] as Map<int, Map<String, String?>>;
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      widget.kebabPlace.name,
+                      style:
+                          const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(widget.kebabPlace.address),
+                    const SizedBox(height: 8),
                     if (widget.kebabPlace.googleMapsRating != null)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: RatingBarIndicator(
-                          rating:
-                              double.parse(widget.kebabPlace.googleMapsRating!),
-                          itemBuilder: (context, index) => const Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                          ),
-                          itemCount: 5,
-                          itemSize: 20.0,
-                          direction: Axis.horizontal,
-                        ),
-                      ),
-                    Text(widget.kebabPlace.googleMapsRating!),
-                  ],
-                ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  if (widget.kebabPlace.isCraft == true) ...[
-                    const BadgeWidget(
-                      text: 'Kraft',
-                      color: Colors.purple,
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  if (widget.kebabPlace.status == 'zamknięte') ...[
-                    const BadgeWidget(
-                      text: 'Zamknięte',
-                      color: Colors.red,
-                    ),
-                    const SizedBox(width: 8),
-                  ] else if (widget.kebabPlace.status == 'otwarte') ...[
-                    const BadgeWidget(
-                      text: 'Otwarte',
-                      color: Colors.green,
-                    ),
-                    const SizedBox(width: 8),
-                  ] else if (widget.kebabPlace.status == 'planowane') ...[
-                    const BadgeWidget(
-                      text: 'Planowane',
-                      color: Colors.orange,
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  if (widget.kebabPlace.openedAtYear != null) ...[
-                    BadgeWidget(
-                      text: 'Od ${widget.kebabPlace.openedAtYear}',
-                      color: Colors.deepOrangeAccent,
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  BadgeWidget(
-                    text: widget.kebabPlace.isChainRestaurant == true
-                        ? 'Sieciówka'
-                        : 'Lokalny Kebab',
-                    color: Colors.blue,
-                  ),
-                  const SizedBox(width: 8),
-                  BadgeWidget(
-                    text: widget.kebabPlace.locationType[0].toUpperCase() +
-                        widget.kebabPlace.locationType.substring(1),
-                    color: Colors.blueGrey,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              if (widget.kebabPlace.phone != null) ...[
-                Row(
-                  children: [
-                    Icon(Icons.phone, color: Theme.of(context).iconTheme.color),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () => _launchURL('tel:${widget.kebabPlace.phone}'),
-                      child: Text(
-                        widget.kebabPlace.phone!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-              ],
-              if (widget.kebabPlace.website != null) ...[
-                Row(
-                  children: [
-                    Icon(Icons.web, color: Theme.of(context).iconTheme.color),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () => _launchURL(widget.kebabPlace.website!),
-                      child: Text(
-                        widget.kebabPlace.website!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-              ],
-              if (widget.kebabPlace.email != null) ...[
-                Row(
-                  children: [
-                    Icon(Icons.email, color: Theme.of(context).iconTheme.color),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () async {
-                        final emailUrl = Uri(
-                          scheme: 'mailto',
-                          path: widget.kebabPlace.email,
-                        ).toString();
-                        try {
-                          await _launchURL(emailUrl);
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Nie można wysłać email do: ${widget.kebabPlace.email}',
+                      Row(
+                        children: [
+                          if (widget.kebabPlace.googleMapsRating != null)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: RatingBarIndicator(
+                                rating:
+                                    double.parse(widget.kebabPlace.googleMapsRating!),
+                                itemBuilder: (context, index) => const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                ),
+                                itemCount: 5,
+                                itemSize: 20.0,
+                                direction: Axis.horizontal,
                               ),
-                              backgroundColor: Colors.red,
                             ),
+                          Text(widget.kebabPlace.googleMapsRating!),
+                        ],
+                      ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        if (widget.kebabPlace.isCraft == true) ...[
+                          const BadgeWidget(
+                            text: 'Kraft',
+                            color: Colors.purple,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        if (widget.kebabPlace.status == 'zamknięte') ...[
+                          const BadgeWidget(
+                            text: 'Zamknięte',
+                            color: Colors.red,
+                          ),
+                          const SizedBox(width: 8),
+                        ] else if (widget.kebabPlace.status == 'otwarte') ...[
+                          const BadgeWidget(
+                            text: 'Otwarte',
+                            color: Colors.green,
+                          ),
+                          const SizedBox(width: 8),
+                        ] else if (widget.kebabPlace.status == 'planowane') ...[
+                          const BadgeWidget(
+                            text: 'Planowane',
+                            color: Colors.orange,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        if (widget.kebabPlace.openedAtYear != null) ...[
+                          BadgeWidget(
+                            text: 'Od ${widget.kebabPlace.openedAtYear}',
+                            color: Colors.deepOrangeAccent,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        BadgeWidget(
+                          text: widget.kebabPlace.isChainRestaurant == true
+                              ? 'Sieciówka'
+                              : 'Lokalny Kebab',
+                          color: Colors.blue,
+                        ),
+                        const SizedBox(width: 8),
+                        BadgeWidget(
+                          text: widget.kebabPlace.locationType[0].toUpperCase() +
+                              widget.kebabPlace.locationType.substring(1),
+                          color: Colors.blueGrey,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (widget.kebabPlace.phone != null) ...[
+                      Row(
+                        children: [
+                          Icon(Icons.phone, color: Theme.of(context).iconTheme.color),
+                          const SizedBox(width: 4),
+                          GestureDetector(
+                            onTap: () => _launchURL('tel:${widget.kebabPlace.phone}'),
+                            child: Text(
+                              widget.kebabPlace.phone!,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
+                    ],
+                    if (widget.kebabPlace.website != null) ...[
+                      Row(
+                        children: [
+                          Icon(Icons.web, color: Theme.of(context).iconTheme.color),
+                          const SizedBox(width: 4),
+                          GestureDetector(
+                            onTap: () => _launchURL(widget.kebabPlace.website!),
+                            child: Text(
+                              widget.kebabPlace.website!,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
+                    ],
+                    if (widget.kebabPlace.email != null) ...[
+                      Row(
+                        children: [
+                          Icon(Icons.email, color: Theme.of(context).iconTheme.color),
+                          const SizedBox(width: 4),
+                          GestureDetector(
+                            onTap: () async {
+                              final emailUrl = Uri(
+                                scheme: 'mailto',
+                                path: widget.kebabPlace.email,
+                              ).toString();
+                              try {
+                                await _launchURL(emailUrl);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Nie można wysłać email do: ${widget.kebabPlace.email}',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text(
+                              widget.kebabPlace.email!,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: widget.kebabPlace.socialMedia.map<Widget>((social) {
+                          switch (social['name']) {
+                            case 'fb':
+                              return SocialMediaButton.facebook(
+                                url: social['url']!,
+                                size: 30,
+                                color: Theme.of(context).iconTheme.color,
+                              );
+                            case 'instagram':
+                              return SocialMediaButton.instagram(
+                                url: social['url']!,
+                                size: 30,
+                                color: Theme.of(context).iconTheme.color,
+                              );
+                            case 'twitter':
+                              return SocialMediaButton.twitter(
+                                url: social['url']!,
+                                size: 30,
+                                color: Theme.of(context).iconTheme.color,
+                              );
+                            default:
+                              return Container();
+                          }
+                        }).toList(),
+                      ),
+                    ],
+                    if (widget.kebabPlace.orderOptions.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      const Text('Opcje zamówienia:', style: TextStyle(fontSize: 20)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8.0,
+                        children: widget.kebabPlace.orderOptions.map((option) {
+                          return BadgeWidget(
+                            text: option,
+                            color: Colors.deepPurple,
+                            solid: true,
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                    if (widget.kebabPlace.ios != null) ...[
+                      const SizedBox(height: 8),
+                      const Text('Aplikacja na iOS:', style: TextStyle(fontSize: 20)),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () => _launchURL(widget.kebabPlace.ios!),
+                        child: const BadgeWidget(
+                          text: 'Pobierz na iOS',
+                          color: Colors.blue,
+                          solid: true,
+                        ),
+                      ),
+                    ],
+                    if (widget.kebabPlace.android != null) ...[
+                      const SizedBox(height: 8),
+                      const Text('Aplikacja na Androida:',
+                          style: TextStyle(fontSize: 20)),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () => _launchURL(widget.kebabPlace.android!),
+                        child: const BadgeWidget(
+                          text: 'Pobierz na Androida',
+                          color: Colors.green,
+                          solid: true,
+                        ),
+                      ),
+                    ],
+                    if (widget.kebabPlace.openingHours.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      const Text('Godziny otwarcia:', style: TextStyle(fontSize: 20)),
+                      const SizedBox(height: 8),
+                      Table(
+                        children: widget.kebabPlace.openingHours.map((hours) {
+                          final from = hours['from'];
+                          final to = hours['to'];
+                          final isClosed = from == null && to == null;
+                          return TableRow(
+                            children: [
+                              Text(hours['day']),
+                              Text(isClosed ? 'zamknięte' : '$from - $to'),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    FutureBuilder<Map<int, Map<String, String?>>>(
+                      future: fillingsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          final fillingsMap = snapshot.data!;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (widget.kebabPlace.fillings.isNotEmpty) ...[
+                                const Text(
+                                  'Główne składniki:',
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8.0,
+                                  children:
+                                      widget.kebabPlace.fillings.map((fillingId) {
+                                    final filling = fillingsMap[fillingId];
+                                    final fillingName = filling?['name'] ?? 'Unknown';
+                                    final fillingColor = filling?['hexColor'] != null
+                                        ? Color(
+                                            int.parse(
+                                                  filling!['hexColor']!
+                                                      .substring(1, 7),
+                                                  radix: 16,
+                                                ) +
+                                                0xFF000000,
+                                          )
+                                        : Colors.green;
+                                    return BadgeWidget(
+                                      text: fillingName,
+                                      color: fillingColor,
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            ],
                           );
                         }
                       },
-                      child: Text(
-                        widget.kebabPlace.email!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
                     ),
                     const SizedBox(height: 8),
+                    FutureBuilder<Map<int, Map<String, String?>>>(
+                      future: saucesFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          final saucesMap = snapshot.data!;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (widget.kebabPlace.sauces.isNotEmpty) ...[
+                                const Text(
+                                  'Dostępne sosy:',
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8.0,
+                                  children: widget.kebabPlace.sauces.map((sauceId) {
+                                    final sauce = saucesMap[sauceId];
+                                    final sauceName = sauce?['name'] ?? 'Unknown';
+                                    final sauceColor = sauce?['hexColor'] != null
+                                        ? Color(
+                                            int.parse(
+                                                  sauce!['hexColor']!.substring(1, 7),
+                                                  radix: 16,
+                                                ) +
+                                                0xFF000000,
+                                          )
+                                        : Colors.red;
+                                    return BadgeWidget(
+                                      text: sauceName,
+                                      color: sauceColor,
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            ],
+                          );
+                        }
+                      },
+                    ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: widget.kebabPlace.socialMedia.map<Widget>((social) {
-                    switch (social['name']) {
-                      case 'fb':
-                        return SocialMediaButton.facebook(
-                          url: social['url']!,
-                          size: 30,
-                          color: Theme.of(context).iconTheme.color,
-                        );
-                      case 'instagram':
-                        return SocialMediaButton.instagram(
-                          url: social['url']!,
-                          size: 30,
-                          color: Theme.of(context).iconTheme.color,
-                        );
-                      case 'twitter':
-                        return SocialMediaButton.twitter(
-                          url: social['url']!,
-                          size: 30,
-                          color: Theme.of(context).iconTheme.color,
-                        );
-                      default:
-                        return Container();
-                    }
-                  }).toList(),
-                ),
-              ],
-              if (widget.kebabPlace.orderOptions.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                const Text('Opcje zamówienia:', style: TextStyle(fontSize: 20)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8.0,
-                  children: widget.kebabPlace.orderOptions.map((option) {
-                    return BadgeWidget(
-                      text: option,
-                      color: Colors.deepPurple,
-                      solid: true,
-                    );
-                  }).toList(),
-                ),
-              ],
-              if (widget.kebabPlace.ios != null) ...[
-                const SizedBox(height: 8),
-                const Text('Aplikacja na iOS:', style: TextStyle(fontSize: 20)),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () => _launchURL(widget.kebabPlace.ios!),
-                  child: const BadgeWidget(
-                    text: 'Pobierz na iOS',
-                    color: Colors.blue,
-                    solid: true,
-                  ),
-                ),
-              ],
-              if (widget.kebabPlace.android != null) ...[
-                const SizedBox(height: 8),
-                const Text('Aplikacja na Androida:',
-                    style: TextStyle(fontSize: 20)),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () => _launchURL(widget.kebabPlace.android!),
-                  child: const BadgeWidget(
-                    text: 'Pobierz na Androida',
-                    color: Colors.green,
-                    solid: true,
-                  ),
-                ),
-              ],
-              if (widget.kebabPlace.openingHours.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                const Text('Godziny otwarcia:', style: TextStyle(fontSize: 20)),
-                const SizedBox(height: 8),
-                Table(
-                  children: widget.kebabPlace.openingHours.map((hours) {
-                    final from = hours['from'];
-                    final to = hours['to'];
-                    final isClosed = from == null && to == null;
-                    return TableRow(
-                      children: [
-                        Text(hours['day']),
-                        Text(isClosed ? 'zamknięte' : '$from - $to'),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ],
-              const SizedBox(height: 8),
-              FutureBuilder<Map<int, Map<String, String?>>>(
-                future: fillingsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    final fillingsMap = snapshot.data!;
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (widget.kebabPlace.fillings.isNotEmpty) ...[
-                          const Text(
-                            'Dostępne nadzienia:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8.0,
-                            children:
-                                widget.kebabPlace.fillings.map((fillingId) {
-                              final filling = fillingsMap[fillingId];
-                              final fillingName = filling?['name'] ?? 'Unknown';
-                              final fillingColor = filling?['hexColor'] != null
-                                  ? Color(
-                                      int.parse(
-                                            filling!['hexColor']!
-                                                .substring(1, 7),
-                                            radix: 16,
-                                          ) +
-                                          0xFF000000,
-                                    )
-                                  : Colors.green;
-                              return BadgeWidget(
-                                text: fillingName,
-                                color: fillingColor,
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ],
-                    );
-                  }
-                },
               ),
-              const SizedBox(height: 8),
-              FutureBuilder<Map<int, Map<String, String?>>>(
-                future: saucesFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    final saucesMap = snapshot.data!;
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (widget.kebabPlace.sauces.isNotEmpty) ...[
-                          const Text(
-                            'Dostępne sosy:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8.0,
-                            children: widget.kebabPlace.sauces.map((sauceId) {
-                              final sauce = saucesMap[sauceId];
-                              final sauceName = sauce?['name'] ?? 'Unknown';
-                              final sauceColor = sauce?['hexColor'] != null
-                                  ? Color(
-                                      int.parse(
-                                            sauce!['hexColor']!.substring(1, 7),
-                                            radix: 16,
-                                          ) +
-                                          0xFF000000,
-                                    )
-                                  : Colors.red;
-                              return BadgeWidget(
-                                text: sauceName,
-                                color: sauceColor,
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ],
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
+            );
+          }
+        },
       ),
     );
   }
