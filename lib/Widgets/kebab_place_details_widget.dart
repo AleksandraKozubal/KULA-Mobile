@@ -67,14 +67,12 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
       ),
       body: FutureBuilder(
         future: Future.wait([fillingsFuture, saucesFuture]),
-        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            final fillingsMap = snapshot.data![0] as Map<int, Map<String, String?>>;
-            final saucesMap = snapshot.data![1] as Map<int, Map<String, String?>>;
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
@@ -83,8 +81,10 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                   children: [
                     Text(
                       widget.kebabPlace.name,
-                      style:
-                          const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(widget.kebabPlace.address),
@@ -96,8 +96,9 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
                               child: RatingBarIndicator(
-                                rating:
-                                    double.parse(widget.kebabPlace.googleMapsRating!),
+                                rating: double.parse(
+                                  widget.kebabPlace.googleMapsRating!,
+                                ),
                                 itemBuilder: (context, index) => const Icon(
                                   Icons.star,
                                   color: Colors.amber,
@@ -154,8 +155,9 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                         ),
                         const SizedBox(width: 8),
                         BadgeWidget(
-                          text: widget.kebabPlace.locationType[0].toUpperCase() +
-                              widget.kebabPlace.locationType.substring(1),
+                          text:
+                              widget.kebabPlace.locationType[0].toUpperCase() +
+                                  widget.kebabPlace.locationType.substring(1),
                           color: Colors.blueGrey,
                         ),
                       ],
@@ -164,10 +166,14 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     if (widget.kebabPlace.phone != null) ...[
                       Row(
                         children: [
-                          Icon(Icons.phone, color: Theme.of(context).iconTheme.color),
+                          Icon(
+                            Icons.phone,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                           const SizedBox(width: 4),
                           GestureDetector(
-                            onTap: () => _launchURL('tel:${widget.kebabPlace.phone}'),
+                            onTap: () =>
+                                _launchURL('tel:${widget.kebabPlace.phone}'),
                             child: Text(
                               widget.kebabPlace.phone!,
                               style: TextStyle(
@@ -183,7 +189,10 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     if (widget.kebabPlace.website != null) ...[
                       Row(
                         children: [
-                          Icon(Icons.web, color: Theme.of(context).iconTheme.color),
+                          Icon(
+                            Icons.web,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                           const SizedBox(width: 4),
                           GestureDetector(
                             onTap: () => _launchURL(widget.kebabPlace.website!),
@@ -202,7 +211,10 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     if (widget.kebabPlace.email != null) ...[
                       Row(
                         children: [
-                          Icon(Icons.email, color: Theme.of(context).iconTheme.color),
+                          Icon(
+                            Icons.email,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                           const SizedBox(width: 4),
                           GestureDetector(
                             onTap: () async {
@@ -236,7 +248,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                       ),
                       const SizedBox(height: 8),
                       Row(
-                        children: widget.kebabPlace.socialMedia.map<Widget>((social) {
+                        children:
+                            widget.kebabPlace.socialMedia.map<Widget>((social) {
                           switch (social['name']) {
                             case 'fb':
                               return SocialMediaButton.facebook(
@@ -264,7 +277,10 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     ],
                     if (widget.kebabPlace.orderOptions.isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      const Text('Opcje zamówienia:', style: TextStyle(fontSize: 20)),
+                      const Text(
+                        'Opcje zamówienia:',
+                        style: TextStyle(fontSize: 20),
+                      ),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8.0,
@@ -279,7 +295,10 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     ],
                     if (widget.kebabPlace.ios != null) ...[
                       const SizedBox(height: 8),
-                      const Text('Aplikacja na iOS:', style: TextStyle(fontSize: 20)),
+                      const Text(
+                        'Aplikacja na iOS:',
+                        style: TextStyle(fontSize: 20),
+                      ),
                       const SizedBox(height: 8),
                       GestureDetector(
                         onTap: () => _launchURL(widget.kebabPlace.ios!),
@@ -292,8 +311,10 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     ],
                     if (widget.kebabPlace.android != null) ...[
                       const SizedBox(height: 8),
-                      const Text('Aplikacja na Androida:',
-                          style: TextStyle(fontSize: 20)),
+                      const Text(
+                        'Aplikacja na Androida:',
+                        style: TextStyle(fontSize: 20),
+                      ),
                       const SizedBox(height: 8),
                       GestureDetector(
                         onTap: () => _launchURL(widget.kebabPlace.android!),
@@ -306,7 +327,10 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     ],
                     if (widget.kebabPlace.openingHours.isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      const Text('Godziny otwarcia:', style: TextStyle(fontSize: 20)),
+                      const Text(
+                        'Godziny otwarcia:',
+                        style: TextStyle(fontSize: 20),
+                      ),
                       const SizedBox(height: 8),
                       Table(
                         children: widget.kebabPlace.openingHours.map((hours) {
@@ -326,7 +350,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     FutureBuilder<Map<int, Map<String, String?>>>(
                       future: fillingsFuture,
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const CircularProgressIndicator();
                         } else if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');
@@ -343,20 +368,22 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                 const SizedBox(height: 8),
                                 Wrap(
                                   spacing: 8.0,
-                                  children:
-                                      widget.kebabPlace.fillings.map((fillingId) {
+                                  children: widget.kebabPlace.fillings
+                                      .map((fillingId) {
                                     final filling = fillingsMap[fillingId];
-                                    final fillingName = filling?['name'] ?? 'Unknown';
-                                    final fillingColor = filling?['hexColor'] != null
-                                        ? Color(
-                                            int.parse(
-                                                  filling!['hexColor']!
-                                                      .substring(1, 7),
-                                                  radix: 16,
-                                                ) +
-                                                0xFF000000,
-                                          )
-                                        : Colors.green;
+                                    final fillingName =
+                                        filling?['name'] ?? 'Unknown';
+                                    final fillingColor =
+                                        filling?['hexColor'] != null
+                                            ? Color(
+                                                int.parse(
+                                                      filling!['hexColor']!
+                                                          .substring(1, 7),
+                                                      radix: 16,
+                                                    ) +
+                                                    0xFF000000,
+                                              )
+                                            : Colors.green;
                                     return BadgeWidget(
                                       text: fillingName,
                                       color: fillingColor,
@@ -373,7 +400,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     FutureBuilder<Map<int, Map<String, String?>>>(
                       future: saucesFuture,
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const CircularProgressIndicator();
                         } else if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');
@@ -390,18 +418,22 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                 const SizedBox(height: 8),
                                 Wrap(
                                   spacing: 8.0,
-                                  children: widget.kebabPlace.sauces.map((sauceId) {
+                                  children:
+                                      widget.kebabPlace.sauces.map((sauceId) {
                                     final sauce = saucesMap[sauceId];
-                                    final sauceName = sauce?['name'] ?? 'Unknown';
-                                    final sauceColor = sauce?['hexColor'] != null
-                                        ? Color(
-                                            int.parse(
-                                                  sauce!['hexColor']!.substring(1, 7),
-                                                  radix: 16,
-                                                ) +
-                                                0xFF000000,
-                                          )
-                                        : Colors.red;
+                                    final sauceName =
+                                        sauce?['name'] ?? 'Unknown';
+                                    final sauceColor =
+                                        sauce?['hexColor'] != null
+                                            ? Color(
+                                                int.parse(
+                                                      sauce!['hexColor']!
+                                                          .substring(1, 7),
+                                                      radix: 16,
+                                                    ) +
+                                                    0xFF000000,
+                                              )
+                                            : Colors.red;
                                     return BadgeWidget(
                                       text: sauceName,
                                       color: sauceColor,

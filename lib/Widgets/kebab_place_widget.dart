@@ -123,13 +123,13 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                kebabPlace.address,
-                              ),
-                              const SizedBox(height: 4.0),
                               Row(
                                 children: [
+                                  Text(
+                                    kebabPlace.address,
+                                  ),
                                   if (kebabPlace.googleMapsRating != null) ...[
+                                    const SizedBox(width: 8.0),
                                     RatingBarIndicator(
                                       rating: double.parse(
                                         kebabPlace.googleMapsRating!,
@@ -143,8 +143,31 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                       itemSize: 20.0,
                                       direction: Axis.horizontal,
                                     ),
-                                    const SizedBox(width: 8.0),
                                   ],
+                                ],
+                              ),
+                              const SizedBox(height: 4.0),
+                              Row(
+                                children: [
+                                  if (kebabPlace.status == 'zamknięte')
+                                    const BadgeWidget(
+                                      text: 'Zamknięte',
+                                      color: Colors.red,
+                                      solid: true,
+                                    ),
+                                  if (kebabPlace.status == 'otwarte')
+                                    const BadgeWidget(
+                                      text: 'Otwarte',
+                                      color: Colors.green,
+                                      solid: true,
+                                    ),
+                                  if (kebabPlace.status == 'planowane')
+                                    const BadgeWidget(
+                                      text: 'Planowane',
+                                      color: Colors.orange,
+                                      solid: true,
+                                    ),
+                                  const SizedBox(width: 8.0),
                                   if (kebabPlace.isCraft == true) ...[
                                     const BadgeWidget(
                                       text: 'Kraft',
