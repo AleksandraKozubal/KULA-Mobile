@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:social_media_buttons/social_media_buttons.dart';
 import 'tiktok_social_media_button.dart';
 
+
 class KebabPlaceDetailsWidget extends StatefulWidget {
   final KebabPlaceModel kebabPlace;
   final FillingRepositoryImpl fillingRepository;
