@@ -124,12 +124,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text('Logowanie'),
-              onTap: () {
-
-              },
+              onTap: () {},
             ),
             ListTile(
-              leading: Icon(widget.isDarkTheme ? Icons.nights_stay : Icons.wb_sunny),
+              leading:
+                  Icon(widget.isDarkTheme ? Icons.nights_stay : Icons.wb_sunny),
               title: const Text('Zmień motyw'),
               onTap: () {
                 widget.toggleTheme();
