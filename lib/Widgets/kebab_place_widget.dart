@@ -57,7 +57,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to load kebab places'),
+          content: Text('Nie udało się załadować kebabów'),
           backgroundColor: Colors.red,
         ),
       );
@@ -194,7 +194,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                       ),
                       BadgeWidget(
                         text: 'Strona $_currentPage / $_totalPages',
-                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
+                        color: Theme.of(context).textTheme.bodyLarge?.color ??
+                            Colors.black,
                       ),
                       ElevatedButton(
                         onPressed: _nextPage,

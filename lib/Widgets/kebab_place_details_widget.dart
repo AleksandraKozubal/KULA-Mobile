@@ -5,6 +5,7 @@ import 'package:kula_mobile/Data/Repositories/filling_repository_impl.dart';
 import 'package:kula_mobile/Data/Repositories/sauce_repository_impl.dart';
 import 'package:kula_mobile/Widgets/badge_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:social_media_buttons/social_media_buttons.dart';
 
 class KebabPlaceDetailsWidget extends StatefulWidget {
   final KebabPlaceModel kebabPlace;
@@ -104,23 +105,48 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                 children: [
                   if (widget.kebabPlace.isCraft == true) ...[
                     const BadgeWidget(
-                      text: 'Craft',
+                      text: 'Kraft',
                       color: Colors.purple,
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  if (widget.kebabPlace.status == 'zamknięte') ...[
+                    const BadgeWidget(
+                      text: 'Zamknięte',
+                      color: Colors.red,
+                    ),
+                    const SizedBox(width: 8),
+                  ] else if (widget.kebabPlace.status == 'otwarte') ...[
+                    const BadgeWidget(
+                      text: 'Otwarte',
+                      color: Colors.green,
+                    ),
+                    const SizedBox(width: 8),
+                  ] else if (widget.kebabPlace.status == 'planowane') ...[
+                    const BadgeWidget(
+                      text: 'Planowane',
+                      color: Colors.orange,
                     ),
                     const SizedBox(width: 8),
                   ],
                   if (widget.kebabPlace.openedAtYear != null) ...[
                     BadgeWidget(
-                      text: 'Since ${widget.kebabPlace.openedAtYear}',
+                      text: 'Od ${widget.kebabPlace.openedAtYear}',
                       color: Colors.deepOrangeAccent,
                     ),
                     const SizedBox(width: 8),
                   ],
                   BadgeWidget(
                     text: widget.kebabPlace.isChainRestaurant == true
-                        ? 'Lokal'
-                        : 'Buda',
+                        ? 'Sieciówka'
+                        : 'Lokalny Kebab',
                     color: Colors.blue,
+                  ),
+                  const SizedBox(width: 8),
+                  BadgeWidget(
+                    text: widget.kebabPlace.locationType[0].toUpperCase() +
+                        widget.kebabPlace.locationType.substring(1),
+                    color: Colors.blueGrey,
                   ),
                 ],
               ),
@@ -180,7 +206,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Could not send email to: ${widget.kebabPlace.email}',
+                                'Nie można wysłać email do: ${widget.kebabPlace.email}',
                               ),
                               backgroundColor: Colors.red,
                             ),
@@ -197,6 +223,75 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                     ),
                     const SizedBox(height: 8),
                   ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: widget.kebabPlace.socialMedia.map<Widget>((social) {
+                    switch (social['name']) {
+                      case 'fb':
+                        return SocialMediaButton.facebook(
+                          url: social['url']!,
+                          size: 30,
+                          color: Theme.of(context).iconTheme.color,
+                        );
+                      case 'instagram':
+                        return SocialMediaButton.instagram(
+                          url: social['url']!,
+                          size: 30,
+                          color: Theme.of(context).iconTheme.color,
+                        );
+                      case 'twitter':
+                        return SocialMediaButton.twitter(
+                          url: social['url']!,
+                          size: 30,
+                          color: Theme.of(context).iconTheme.color,
+                        );
+                      default:
+                        return Container();
+                    }
+                  }).toList(),
+                ),
+              ],
+              if (widget.kebabPlace.orderOptions.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                const Text('Opcje zamówienia:', style: TextStyle(fontSize: 20)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8.0,
+                  children: widget.kebabPlace.orderOptions.map((option) {
+                    return BadgeWidget(
+                      text: option,
+                      color: Colors.deepPurple,
+                      solid: true,
+                    );
+                  }).toList(),
+                ),
+              ],
+              if (widget.kebabPlace.ios != null) ...[
+                const SizedBox(height: 8),
+                const Text('Aplikacja na iOS:', style: TextStyle(fontSize: 20)),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () => _launchURL(widget.kebabPlace.ios!),
+                  child: const BadgeWidget(
+                    text: 'Pobierz na iOS',
+                    color: Colors.blue,
+                    solid: true,
+                  ),
+                ),
+              ],
+              if (widget.kebabPlace.android != null) ...[
+                const SizedBox(height: 8),
+                const Text('Aplikacja na Androida:',
+                    style: TextStyle(fontSize: 20)),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () => _launchURL(widget.kebabPlace.android!),
+                  child: const BadgeWidget(
+                    text: 'Pobierz na Androida',
+                    color: Colors.green,
+                    solid: true,
+                  ),
                 ),
               ],
               if (widget.kebabPlace.openingHours.isNotEmpty) ...[
@@ -240,10 +335,14 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                               final filling = fillingsMap[fillingId];
                               final fillingName = filling?['name'] ?? 'Unknown';
                               final fillingColor = filling?['hexColor'] != null
-                                  ? Color(int.parse(
-                                          filling!['hexColor']!.substring(1, 7),
-                                          radix: 16) +
-                                      0xFF000000)
+                                  ? Color(
+                                      int.parse(
+                                            filling!['hexColor']!
+                                                .substring(1, 7),
+                                            radix: 16,
+                                          ) +
+                                          0xFF000000,
+                                    )
                                   : Colors.green;
                               return BadgeWidget(
                                 text: fillingName,
@@ -282,10 +381,13 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                               final sauce = saucesMap[sauceId];
                               final sauceName = sauce?['name'] ?? 'Unknown';
                               final sauceColor = sauce?['hexColor'] != null
-                                  ? Color(int.parse(
-                                          sauce!['hexColor']!.substring(1, 7),
-                                          radix: 16) +
-                                      0xFF000000)
+                                  ? Color(
+                                      int.parse(
+                                            sauce!['hexColor']!.substring(1, 7),
+                                            radix: 16,
+                                          ) +
+                                          0xFF000000,
+                                    )
                                   : Colors.red;
                               return BadgeWidget(
                                 text: sauceName,

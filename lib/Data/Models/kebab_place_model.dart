@@ -9,6 +9,8 @@ class KebabPlaceModel {
   final String? googleMapsRating;
   final String? phone;
   final String? website;
+  final String? ios;
+  final String? android;
   final String? email;
   final int? openedAtYear;
   final int? closedAtYear;
@@ -42,6 +44,8 @@ class KebabPlaceModel {
     this.googleMapsRating,
     this.phone,
     this.website,
+    this.ios,
+    this.android,
     this.email,
     this.openedAtYear,
     this.closedAtYear,
@@ -58,7 +62,10 @@ class KebabPlaceModel {
       address: json['address'],
       openingHours: json['opening_hours'] != null
           ? List<Map<String, dynamic>>.from(
-              (json['opening_hours'] as List<dynamic>).map((item) => Map<String, dynamic>.from(item as Map<String, dynamic>)),
+              (json['opening_hours'] as List<dynamic>).map(
+                (item) =>
+                    Map<String, dynamic>.from(item as Map<String, dynamic>),
+              ),
             )
           : [],
       status: json['status'],
@@ -68,7 +75,10 @@ class KebabPlaceModel {
           : [],
       socialMedia: json['social_media'] != null
           ? List<Map<String, dynamic>>.from(
-              (json['social_media']as List<dynamic>).map((item) => Map<String, dynamic>.from(item as Map<String, dynamic>)),
+              (json['social_media'] as List<dynamic>).map(
+                (item) =>
+                    Map<String, dynamic>.from(item as Map<String, dynamic>),
+              ),
             )
           : [],
       image: json['image'],
@@ -78,10 +88,13 @@ class KebabPlaceModel {
       googleMapsRating: json['google_maps_rating'],
       phone: json['phone'],
       website: json['website'],
+      ios: json['ios'],
+      android: json['android'],
       email: json['email'],
       openedAtYear: json['opened_at_year'],
       closedAtYear: json['closed_at_year'],
-      fillings: json['fillings'] != null ? List<int>.from(json['fillings']) : [],
+      fillings:
+          json['fillings'] != null ? List<int>.from(json['fillings']) : [],
       sauces: json['sauces'] != null ? List<int>.from(json['sauces']) : [],
       isCraft: json['is_craft'],
       isChainRestaurant: json['is_chain_restaurant'],
@@ -111,6 +124,8 @@ class KebabPlaceModel {
       'google_maps_rating': googleMapsRating,
       'phone': phone,
       'website': website,
+      'ios': ios,
+      'android': android,
       'email': email,
       'opened_at_year': openedAtYear,
       'closed_at_year': closedAtYear,
