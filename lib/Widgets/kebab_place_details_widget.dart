@@ -300,10 +300,13 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                 const SizedBox(height: 8),
                 Table(
                   children: widget.kebabPlace.openingHours.map((hours) {
+                    final from = hours['from'];
+                    final to = hours['to'];
+                    final isClosed = from == null && to == null;
                     return TableRow(
                       children: [
                         Text(hours['day']),
-                        Text('${hours['from']} - ${hours['to']}'),
+                        Text(isClosed ? 'zamknięte' : '$from - $to'),
                       ],
                     );
                   }).toList(),
