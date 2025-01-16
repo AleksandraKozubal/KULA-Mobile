@@ -11,6 +11,7 @@ import 'package:kula_mobile/Data/Models/user_model.dart';
 import 'package:kula_mobile/Data/Repositories/user_repository_impl.dart';
 import 'package:kula_mobile/Data/Data_sources/user_data_source.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   await dotenv.load();
@@ -38,7 +39,20 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _loadTheme();
     _checkLoggedInUser();
+  }
+
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
+    });
+  }
+
+  Future<void> _saveTheme(bool isDarkTheme) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkTheme', isDarkTheme);
   }
 
   Future<void> _checkLoggedInUser() async {
@@ -78,6 +92,7 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _isDarkTheme = !_isDarkTheme;
     });
+    _saveTheme(_isDarkTheme);
   }
 
   @override
