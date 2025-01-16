@@ -1,6 +1,6 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kula_mobile/Services/token_storage.dart';
 
 class LogoutDataSource {
   final http.Client client;
@@ -8,13 +8,10 @@ class LogoutDataSource {
 
   LogoutDataSource({required this.client});
 
-  Future<void> logout() async {
+  Future<void> logout(String? token) async {
     if (apiUrl == null) {
       throw Exception('API URL is not set');
     }
-
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('bearer_token');
 
     final response = await client.post(
       Uri.parse('$apiUrl/logout'),
@@ -24,7 +21,10 @@ class LogoutDataSource {
     );
 
     if (response.statusCode == 200) {
-      await prefs.remove('bearer_token');
+      await TokenStorage.clearToken();
+      return;
+    } else if (response.statusCode == 401) {
+      await TokenStorage.clearToken();
       return;
     } else {
       throw Exception('Failed to logout');

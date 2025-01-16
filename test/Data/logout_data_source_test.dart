@@ -5,48 +5,73 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:kula_mobile/Data/Data_sources/logout_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-@GenerateMocks([http.Client])
 import 'logout_data_source_test.mocks.dart';
 
+@GenerateNiceMocks([MockSpec<http.Client>()])
 void main() {
   group('LogoutDataSource', () {
-    late MockClient client;
+    late MockClient mockClient;
     late LogoutDataSource logoutDataSource;
 
     setUp(() async {
-      client = MockClient();
+      mockClient = MockClient();
       await dotenv.load(fileName: '.env');
-      logoutDataSource = LogoutDataSource(client: client);
-      SharedPreferences.setMockInitialValues({'bearer_token': 'some_token'});
+      SharedPreferences.setMockInitialValues({});
+      logoutDataSource = LogoutDataSource(client: mockClient);
     });
 
-    test('logout clears bearer token on successful logout', () async {
+    test('logout clears token on successful logout', () async {
+      const token = 'some_token';
+      const apiUrl = 'http://10.0.2.2:63251/api';
+
       when(
-        client.post(
-          any,
-          headers: anyNamed('headers'),
+        mockClient.post(
+          Uri.parse('$apiUrl/logout'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
         ),
       ).thenAnswer((_) async => http.Response('', 200));
 
-      await logoutDataSource.logout();
+      await logoutDataSource.logout(token);
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getString('bearer_token'), isNull);
     });
 
-    test('logout throws exception on failed logout', () async {
+    test('logout clears token on unauthorized logout', () async {
+      const token = 'some_token';
+      const apiUrl = 'http://10.0.2.2:63251/api';
+
       when(
-        client.post(
-          any,
-          headers: anyNamed('headers'),
+        mockClient.post(
+          Uri.parse('$apiUrl/logout'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
         ),
       ).thenAnswer((_) async => http.Response('Unauthorized', 401));
 
-      expect(
-        () async => await logoutDataSource.logout(),
-        throwsException,
-      );
+      await logoutDataSource.logout(token);
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('bearer_token'), isNull);
+    });
+
+    test('logout throws an exception on failed logout', () async {
+      const token = 'some_token';
+      const apiUrl = 'http://10.0.2.2:63251/api';
+
+      when(
+        mockClient.post(
+          Uri.parse('$apiUrl/logout'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      ).thenAnswer((_) async => http.Response('Internal Server Error', 500));
+
+      expect(() => logoutDataSource.logout(token), throwsException);
     });
   });
 }

@@ -1,8 +1,8 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kula_mobile/Data/Models/user_model.dart';
+import 'package:kula_mobile/Services/token_storage.dart';
 
 class RegisterDataSource {
   final http.Client client;
@@ -10,8 +10,12 @@ class RegisterDataSource {
 
   RegisterDataSource({required this.client});
 
-  Future<UserModel> registerUser(String name, String email, String password,
-      String passwordConfirm) async {
+  Future<UserModel> registerUser(
+    String name,
+    String email,
+    String password,
+    String passwordConfirm,
+  ) async {
     if (apiUrl == null) {
       throw Exception('API URL is not set');
     }
@@ -30,8 +34,7 @@ class RegisterDataSource {
       final jsonResponse = json.decode(response.body);
       final token = jsonResponse['token'];
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('bearer_token', token);
+      await TokenStorage.saveToken(token);
 
       final user = UserModel.fromJson(jsonResponse['user']);
       user.token = token;

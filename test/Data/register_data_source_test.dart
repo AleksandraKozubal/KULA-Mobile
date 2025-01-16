@@ -41,7 +41,11 @@ void main() {
       ).thenAnswer((_) async => http.Response(json.encode(response), 201));
 
       await registerDataSource.registerUser(
-          'John Doe', 'john.doe@example.com', 'password', 'password');
+        'John Doe',
+        'john.doe@example.com',
+        'password',
+        'password',
+      );
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getString('bearer_token'), 'some_token');
@@ -57,7 +61,11 @@ void main() {
 
       expect(
         () async => await registerDataSource.registerUser(
-            'John Doe', 'john.doe@example.com', 'password', 'password'),
+          'John Doe',
+          'john.doe@example.com',
+          'password',
+          'password',
+        ),
         throwsException,
       );
     });
