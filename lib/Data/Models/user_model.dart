@@ -2,12 +2,7 @@ class UserModel {
   final int id;
   final String name;
   final String email;
-  final DateTime? emailVerifiedAt;
-  final String password;
-  String rememberToken;
-  final String role;
   String token;
-  final bool isActive;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -15,12 +10,7 @@ class UserModel {
     required this.id,
     required this.name,
     required this.email,
-    required this.password,
-    required this.rememberToken,
-    required this.role,
     required this.token,
-    required this.isActive,
-    this.emailVerifiedAt,
     this.createdAt,
     this.updatedAt,
   });
@@ -30,14 +20,7 @@ class UserModel {
       id: json['id'],
       name: json['name'],
       email: json['email'],
-      emailVerifiedAt: json['email_verified_at'] != null
-          ? DateTime.parse(json['email_verified_at'])
-          : null,
-      password: json['password'],
-      rememberToken: json['remember_token'],
-      role: json['role'],
       token: json['token'],
-      isActive: json['is_active'],
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : null,
@@ -52,12 +35,7 @@ class UserModel {
       'id': id,
       'name': name,
       'email': email,
-      'email_verified_at': emailVerifiedAt?.toIso8601String(),
-      'password': password,
-      'remember_token': rememberToken,
-      'role': role,
       'token' : token,
-      'is_active': isActive,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
