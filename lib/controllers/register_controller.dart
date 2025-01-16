@@ -14,9 +14,10 @@ class RegisterController extends GetxController {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<void> registerWithEmail() async {
-    try{
+    try {
       final headers = {'Content-Type': 'application/json'};
-      final url = Uri.parse(ApiEndPoints.baseUrl!+ApiEndPoints.authEndpoints.registerMail);
+      final url = Uri.parse(
+          ApiEndPoints.baseUrl! + ApiEndPoints.authEndpoints.registerMail);
       final Map body = {
         'name': nameController.text,
         'email': emailController.text.trim(),
@@ -26,7 +27,7 @@ class RegisterController extends GetxController {
       http.Response response =
           await http.post(url, body: jsonEncode(body), headers: headers);
 
-      if(response.statusCode == 200){
+      if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         var token = json['data']['Token'];
         final SharedPreferences prefs = await _prefs;
@@ -35,22 +36,20 @@ class RegisterController extends GetxController {
         nameController.clear();
         emailController.clear();
         passwordController.clear();
-      }
-      else{
+      } else {
         throw jsonDecode(response.body)['Message'] ?? 'Wystąpił nieznany błąd';
       }
     } catch (e) {
       Get.back();
       await showDialog(
           context: Get.context!,
-          builder: (context){
+          builder: (context) {
             return SimpleDialog(
               title: const Text('error'),
               contentPadding: const EdgeInsets.all(20),
               children: [Text(e.toString())],
             );
-          }
-      );
+          });
     }
   }
 }

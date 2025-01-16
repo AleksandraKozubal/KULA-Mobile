@@ -38,14 +38,13 @@ class LoginController extends GetxController {
       Get.back();
       await showDialog(
           context: Get.context!,
-          builder: (context){
+          builder: (context) {
             return SimpleDialog(
               title: const Text('error'),
               contentPadding: const EdgeInsets.all(20),
               children: [Text(e.toString())],
             );
-          }
-      );
+          });
     }
   }
 }
