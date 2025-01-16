@@ -92,7 +92,18 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(_isLogin ? 'Logowanie' : 'Rejestracja'),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(_isLogin ? 'Logowanie' : 'Rejestracja'),
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -142,14 +153,6 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
           ],
         ),
       ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Anuluj'),
-        ),
-      ],
     );
   }
 }
