@@ -22,7 +22,8 @@ void main() {
       SharedPreferences.setMockInitialValues({});
     });
 
-    test('registerUser saves bearer token on successful registration', () async {
+    test('registerUser saves bearer token on successful registration',
+        () async {
       final response = {
         'token': 'some_token',
         'user': {
@@ -32,25 +33,31 @@ void main() {
         },
       };
 
-      when(client.post(
-        any,
-        body: anyNamed('body'),
-      )).thenAnswer((_) async => http.Response(json.encode(response), 200));
+      when(
+        client.post(
+          any,
+          body: anyNamed('body'),
+        ),
+      ).thenAnswer((_) async => http.Response(json.encode(response), 201));
 
-      await registerDataSource.registerUser('John Doe', 'john.doe@example.com', 'password', 'password');
+      await registerDataSource.registerUser(
+          'John Doe', 'john.doe@example.com', 'password', 'password');
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getString('bearer_token'), 'some_token');
     });
 
     test('registerUser throws exception on failed registration', () async {
-      when(client.post(
-        any,
-        body: anyNamed('body'),
-      )).thenAnswer((_) async => http.Response('Bad Request', 400));
+      when(
+        client.post(
+          any,
+          body: anyNamed('body'),
+        ),
+      ).thenAnswer((_) async => http.Response('Bad Request', 401));
 
       expect(
-        () async => await registerDataSource.registerUser('John Doe', 'john.doe@example.com', 'password', 'password'),
+        () async => await registerDataSource.registerUser(
+            'John Doe', 'john.doe@example.com', 'password', 'password'),
         throwsException,
       );
     });

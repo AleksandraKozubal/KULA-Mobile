@@ -22,10 +22,12 @@ void main() {
     });
 
     test('logout clears bearer token on successful logout', () async {
-      when(client.post(
-        any,
-        headers: anyNamed('headers'),
-      )).thenAnswer((_) async => http.Response('', 200));
+      when(
+        client.post(
+          any,
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer((_) async => http.Response('', 200));
 
       await logoutDataSource.logout();
 
@@ -34,10 +36,12 @@ void main() {
     });
 
     test('logout throws exception on failed logout', () async {
-      when(client.post(
-        any,
-        headers: anyNamed('headers'),
-      )).thenAnswer((_) async => http.Response('Unauthorized', 401));
+      when(
+        client.post(
+          any,
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer((_) async => http.Response('Unauthorized', 401));
 
       expect(
         () async => await logoutDataSource.logout(),

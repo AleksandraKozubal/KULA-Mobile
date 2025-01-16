@@ -10,7 +10,12 @@ class RegisterDataSource {
 
   RegisterDataSource({required this.client});
 
-  Future<void> registerUser(String name, String email, String password, String passwordConfirm) async {
+  Future<UserModel> registerUser(String name, String email, String password,
+      String passwordConfirm) async {
+    if (apiUrl == null) {
+      throw Exception('API URL is not set');
+    }
+
     final response = await client.post(
       Uri.parse('$apiUrl/register'),
       body: {
@@ -24,12 +29,13 @@ class RegisterDataSource {
     if (response.statusCode == 201) {
       final jsonResponse = json.decode(response.body);
       final token = jsonResponse['token'];
-      
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('bearer_token', token);
 
-      UserModel user = UserModel.fromJson(jsonResponse['user']);
+      final user = UserModel.fromJson(jsonResponse['user']);
       user.token = token;
+      return user;
     } else {
       throw Exception('Failed to register');
     }

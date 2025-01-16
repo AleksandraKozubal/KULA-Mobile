@@ -9,6 +9,10 @@ class LogoutDataSource {
   LogoutDataSource({required this.client});
 
   Future<void> logout() async {
+    if (apiUrl == null) {
+      throw Exception('API URL is not set');
+    }
+
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('bearer_token');
 

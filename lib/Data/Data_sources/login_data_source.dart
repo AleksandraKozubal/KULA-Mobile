@@ -10,7 +10,11 @@ class LoginDataSource {
 
   LoginDataSource({required this.client});
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  Future<UserModel> login(String email, String password) async {
+    if (apiUrl == null) {
+      throw Exception('API URL is not set');
+    }
+
     final response = await client.post(
       Uri.parse('$apiUrl/login'),
       body: {
@@ -22,19 +26,15 @@ class LoginDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       final token = jsonResponse['token'];
-      
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('bearer_token', token);
 
-      UserModel user = UserModel.fromJson(jsonResponse['user']);
+      final user = UserModel.fromJson(jsonResponse['user']);
       user.token = token;
-
-      return {
-        'data': jsonResponse,
-      };
+      return user;
     } else {
       throw Exception('Failed to login');
     }
   }
-
 }
