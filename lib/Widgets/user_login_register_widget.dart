@@ -134,8 +134,9 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
               onPressed: _toggleForm,
               child: Text(
                 _isLogin
-                    ? 'Nie masz konta? Zarejestruj się'
-                    : 'Masz już konto? Zaloguj się',
+                    ? 'Nie masz konta?\nZarejestruj się'
+                    : 'Masz już konto?\nZaloguj się',
+                textAlign: TextAlign.center,
               ),
             ),
           ],
