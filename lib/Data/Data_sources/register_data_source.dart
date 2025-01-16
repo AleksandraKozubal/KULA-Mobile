@@ -21,7 +21,7 @@ class RegisterDataSource {
       },
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       final jsonResponse = json.decode(response.body);
       final token = jsonResponse['token'];
       
