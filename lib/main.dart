@@ -204,6 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 leading: const Icon(Icons.person),
                 title: const Text('Logowanie'),
                 onTap: () {
+                  Navigator.of(context).pop();
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -222,6 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Icon(widget.isDarkTheme ? Icons.nights_stay : Icons.wb_sunny),
               title: const Text('Zmień motyw'),
               onTap: () {
+                Navigator.of(context).pop(); // Close the drawer
                 widget.toggleTheme();
               },
             ),
@@ -230,6 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 leading: const Icon(Icons.logout),
                 title: const Text('Wyloguj się'),
                 onTap: () async {
+                  Navigator.of(context).pop(); // Close the drawer
                   await widget.userRepository.logoutUser();
                   await context
                       .findAncestorStateOfType<_MyAppState>()!
