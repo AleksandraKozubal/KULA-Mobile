@@ -2,7 +2,7 @@ class UserModel {
   final int id;
   final String name;
   final String email;
-  String token;
+  String? token;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -10,7 +10,7 @@ class UserModel {
     required this.id,
     required this.name,
     required this.email,
-    required this.token,
+    this.token,
     this.createdAt,
     this.updatedAt,
   });
@@ -35,7 +35,7 @@ class UserModel {
       'id': id,
       'name': name,
       'email': email,
-      'token' : token,
+      'token': token,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
