@@ -40,7 +40,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
     try {
       final response = await KebabPlaceRepositoryImpl(
         KebabPlaceDataSource(client: http.Client()),
-      ).getKebabPlaces(page: _currentPage);
+      ).getKebabPlaces(page: _currentPage, paginate: 10);
       setState(() {
         if (_currentPage == 1) {
           _kebabPlaces = response['data'];

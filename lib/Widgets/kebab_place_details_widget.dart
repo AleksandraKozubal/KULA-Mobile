@@ -242,8 +242,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                               final fillingColor = filling?['hexColor'] != null
                                   ? Color(int.parse(
                                           filling!['hexColor']!.substring(1, 7),
-                                          radix: 16) +
-                                      0xFF000000)
+                                          radix: 16,) +
+                                      0xFF000000,)
                                   : Colors.green;
                               return BadgeWidget(
                                 text: fillingName,
@@ -284,8 +284,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                               final sauceColor = sauce?['hexColor'] != null
                                   ? Color(int.parse(
                                           sauce!['hexColor']!.substring(1, 7),
-                                          radix: 16) +
-                                      0xFF000000)
+                                          radix: 16,) +
+                                      0xFF000000,)
                                   : Colors.red;
                               return BadgeWidget(
                                 text: sauceName,

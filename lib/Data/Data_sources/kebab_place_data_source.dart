@@ -9,9 +9,21 @@ class KebabPlaceDataSource {
 
   KebabPlaceDataSource({required this.client});
 
-  Future<Map<String, dynamic>> getKebabPlaces({int page = 1}) async {
-    final response =
-        await client.get(Uri.parse('$apiUrl/kebab-places?page=$page'));
+  Future<Map<String, dynamic>> getKebabPlaces({
+    int page = 1,
+    String? sby,
+    String? sdirection,
+    String? ffillings,
+    String? fsauces,
+    bool? fkraft,
+    int? paginate,
+  }) async {
+
+    final response = await client.get(
+      Uri.parse(
+        '$apiUrl/kebab-places?page=$page${sby != null ? '&sby=$sby' : ''}${sdirection != null ? '&sdirection=$sdirection' : ''}${ffillings != null ? '&ffillings=$ffillings' : ''}${fsauces != null ? '&fsauces=$fsauces' : ''}${fkraft != null ? '&fkraft=$fkraft' : ''}${paginate != null ? '&paginate=$paginate' : ''}',
+      ),
+    );
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       final List<dynamic> data = jsonResponse['data'];
