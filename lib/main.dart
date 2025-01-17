@@ -36,6 +36,8 @@ class _MyAppState extends State<MyApp> {
     userDataSource: UserDataSource(client: http.Client()),
   );
 
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +80,11 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         _loggedInUser = null;
       });
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+        const SnackBar(
+          content: Text('Wylogowano pomyślnie'),
+        ),
+      );
     } catch (e) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,6 +105,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'KULA',
       theme: _isDarkTheme ? ThemeData.dark() : ThemeData.light(),
       home: MyHomePage(
@@ -238,7 +246,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       .findAncestorStateOfType<_MyAppState>()!
                       ._logout();
                   setState(() {});
-                  Navigator.of(context).pop();
                 },
               ),
           ],

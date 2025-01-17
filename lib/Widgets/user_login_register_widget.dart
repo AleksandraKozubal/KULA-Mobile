@@ -40,14 +40,14 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
     try {
       if (_isLogin) {
         user = await _userRepository.loginUser(
-          _emailController.text,
+          _emailController.text.trim().toLowerCase(),
           _passwordController.text,
         );
       } else {
         if (_passwordController.text == _confirmPasswordController.text) {
           user = await _userRepository.registerUser(
             _nameController.text,
-            _emailController.text,
+            _emailController.text.trim().toLowerCase(),
             _passwordController.text,
             _confirmPasswordController.text,
           );
@@ -61,6 +61,11 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
         await TokenStorage.saveToken(user.token!);
       }
       Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_isLogin ? 'Zalogowano pomyślnie' : 'Zarejestrowano pomyślnie'),
+        ),
+      );
     } catch (e) {
       Navigator.of(context).pop();
       _showErrorDialog(
