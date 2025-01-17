@@ -45,8 +45,14 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
     final hasUppercase = password.contains(RegExp(r'[A-Z]'));
     final hasLowercase = password.contains(RegExp(r'[a-z]'));
     final hasDigit = password.contains(RegExp(r'\d'));
-    final hasSpecialCharacter = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-    final validConditions = [hasUppercase, hasLowercase, hasDigit, hasSpecialCharacter].where((c) => c).length;
+    final hasSpecialCharacter =
+        password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+    final validConditions = [
+      hasUppercase,
+      hasLowercase,
+      hasDigit,
+      hasSpecialCharacter,
+    ].where((c) => c).length;
     return validConditions >= 3;
   }
 
@@ -56,14 +62,19 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
       return;
     }
     if (!_validatePassword(_passwordController.text)) {
-      _showErrorDialog(_isLogin ? 'Nieprawidłowe hasło' : 'Hasło musi zawierać co najmniej 8 znaków, w tym 3 z 4 wymagań: 1 wielka litera, 1 mała litera, 1 cyfra i 1 znak specjalny');
+      _showErrorDialog(
+        _isLogin
+            ? 'Nieprawidłowe hasło'
+            : 'Hasło musi zawierać co najmniej 8 znaków, w tym 3 z 4 wymagań: 1 wielka litera, 1 mała litera, 1 cyfra i 1 znak specjalny',
+      );
       return;
     }
     if (!_isLogin && _nameController.text.trim().isEmpty) {
       _showErrorDialog('Nazwa użytkownika jest wymagana');
       return;
     }
-    if (!_isLogin && _passwordController.text != _confirmPasswordController.text) {
+    if (!_isLogin &&
+        _passwordController.text != _confirmPasswordController.text) {
       _showErrorDialog('Hasła się nie zgadzają');
       return;
     }
@@ -89,7 +100,9 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_isLogin ? 'Zalogowano pomyślnie' : 'Zarejestrowano pomyślnie'),
+          content: Text(
+            _isLogin ? 'Zalogowano pomyślnie' : 'Zarejestrowano pomyślnie',
+          ),
         ),
       );
     } catch (e) {
