@@ -43,6 +43,7 @@ dependencies:
   url_launcher: ^6.3.1
   diacritic: ^0.1.6
   social_media_buttons: ^1.0.0
+  flutter_map: ^7.0.2
 
 dev_dependencies:
   flutter_test:
