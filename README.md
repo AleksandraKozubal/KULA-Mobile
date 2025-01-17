@@ -22,6 +22,11 @@ KULA-Mobile is a mobile application designed to help users locate and explore ke
 
 ## Local development
 
+Create .env from example .env (for Android local development use http://10.0.2.2:63251/api )
+```
+cp .env.example .env
+```
+
 Useful commands: 
 - To check if your project is setup properly use:
 ```shell
