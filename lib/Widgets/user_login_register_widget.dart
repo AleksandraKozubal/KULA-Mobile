@@ -35,7 +35,39 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
     });
   }
 
+  bool _validateEmail(String email) {
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    return emailRegex.hasMatch(email);
+  }
+
+  bool _validatePassword(String password) {
+    if (password.length < 8) return false;
+    final hasUppercase = password.contains(RegExp(r'[A-Z]'));
+    final hasLowercase = password.contains(RegExp(r'[a-z]'));
+    final hasDigit = password.contains(RegExp(r'\d'));
+    final hasSpecialCharacter = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+    final validConditions = [hasUppercase, hasLowercase, hasDigit, hasSpecialCharacter].where((c) => c).length;
+    return validConditions >= 3;
+  }
+
   Future<void> _submit() async {
+    if (!_validateEmail(_emailController.text.trim().toLowerCase())) {
+      _showErrorDialog('Nieprawidłowy format email');
+      return;
+    }
+    if (!_validatePassword(_passwordController.text)) {
+      _showErrorDialog(_isLogin ? 'Nieprawidłowe hasło' : 'Hasło musi zawierać co najmniej 8 znaków, w tym 3 z 4 wymagań: 1 wielka litera, 1 mała litera, 1 cyfra i 1 znak specjalny');
+      return;
+    }
+    if (!_isLogin && _nameController.text.trim().isEmpty) {
+      _showErrorDialog('Nazwa użytkownika jest wymagana');
+      return;
+    }
+    if (!_isLogin && _passwordController.text != _confirmPasswordController.text) {
+      _showErrorDialog('Hasła się nie zgadzają');
+      return;
+    }
+
     UserModel? user;
     try {
       if (_isLogin) {
@@ -44,18 +76,12 @@ class UserLoginRegisterWidgetState extends State<UserLoginRegisterWidget> {
           _passwordController.text,
         );
       } else {
-        if (_passwordController.text == _confirmPasswordController.text) {
-          user = await _userRepository.registerUser(
-            _nameController.text,
-            _emailController.text.trim().toLowerCase(),
-            _passwordController.text,
-            _confirmPasswordController.text,
-          );
-        } else {
-          Navigator.of(context).pop();
-          _showErrorDialog('Hasła się nie zgadzają');
-          return;
-        }
+        user = await _userRepository.registerUser(
+          _nameController.text.trim(),
+          _emailController.text.trim().toLowerCase(),
+          _passwordController.text,
+          _confirmPasswordController.text,
+        );
       }
       if (user.token != null) {
         await TokenStorage.saveToken(user.token!);
