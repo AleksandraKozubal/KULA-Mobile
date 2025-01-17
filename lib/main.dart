@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'Widgets/kebab_place_widget.dart';
+import 'Widgets/kebab_place_map_widget.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
@@ -137,7 +138,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      body: const Center(),
+      body: const Center(
+        child: KebabPlaceMapWidget(),
+      ),
     );
   }
 }
