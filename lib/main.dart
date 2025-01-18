@@ -71,15 +71,14 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
         ),
-        // Removed the search/list button from the app bar
       ),
       drawer: Drawer(
-        width: 200, // Make the drawer slimmer
+        width: 200,
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             Container(
-              height: 100, // Make the header smaller
+              height: 100,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.inversePrimary,
               ),
