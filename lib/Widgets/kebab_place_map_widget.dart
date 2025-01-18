@@ -282,9 +282,10 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
                       ),
                     ),
                     const SizedBox(width: 4.0),
-                    Text('Zamknięte',
-                        style:
-                            TextStyle(color: theme.textTheme.bodyLarge?.color)),
+                    Text(
+                      'Zamknięte',
+                      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4.0),
@@ -302,9 +303,10 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
                       ),
                     ),
                     const SizedBox(width: 4.0),
-                    Text('Planowane',
-                        style:
-                            TextStyle(color: theme.textTheme.bodyLarge?.color)),
+                    Text(
+                      'Planowane',
+                      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4.0),
@@ -318,9 +320,10 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
                       ),
                     ),
                     const SizedBox(width: 4.0),
-                    Text('Otwarte',
-                        style:
-                            TextStyle(color: theme.textTheme.bodyLarge?.color)),
+                    Text(
+                      'Otwarte',
+                      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                    ),
                   ],
                 ),
               ],
