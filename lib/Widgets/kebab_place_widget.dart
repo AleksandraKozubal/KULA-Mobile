@@ -168,7 +168,6 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                       solid: true,
                                     ),
                                   const SizedBox(width: 8.0),
-
                                   if (kebabPlace.isCraft == true) ...[
                                     const BadgeWidget(
                                       text: 'Kraft',
