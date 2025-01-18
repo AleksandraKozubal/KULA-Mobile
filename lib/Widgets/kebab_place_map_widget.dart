@@ -56,7 +56,7 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
   }
 
   Future<String> _loadSvgAsset(String path) async {
-    String svgString = await rootBundle.loadString(path);
+    var svgString = await rootBundle.loadString(path);
     svgString = svgString.replaceAll('<sodipodi:namedview/>', '');
     return svgString;
   }
@@ -115,11 +115,13 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
                                   Row(
                                     children: [
                                       Text(
-                                          'Ocena: ${kebabPlace.googleMapsRating}'),
+                                        'Ocena: ${kebabPlace.googleMapsRating}',
+                                      ),
                                       const SizedBox(width: 8.0),
                                       RatingBarIndicator(
                                         rating: double.parse(
-                                            kebabPlace.googleMapsRating!),
+                                          kebabPlace.googleMapsRating!,
+                                        ),
                                         itemBuilder: (context, index) =>
                                             const Icon(
                                           Icons.star,
@@ -135,7 +137,8 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
                                   Text('Telefon: ${kebabPlace.phone}'),
                                 if (kebabPlace.website != null)
                                   Text(
-                                      'Strona internetowa: ${kebabPlace.website}'),
+                                    'Strona internetowa: ${kebabPlace.website}',
+                                  ),
                                 const SizedBox(height: 4.0),
                                 Row(
                                   children: [
@@ -191,11 +194,13 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
                                           fillingRepository:
                                               FillingRepositoryImpl(
                                             FillingDataSource(
-                                                client: http.Client()),
+                                              client: http.Client(),
+                                            ),
                                           ),
                                           sauceRepository: SauceRepositoryImpl(
                                             SauceDataSource(
-                                                client: http.Client()),
+                                              client: http.Client(),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -211,7 +216,8 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
                       child: FutureBuilder<String>(
                         future: _loadSvgAsset('assets/kebab.svg'),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return const CircularProgressIndicator();
                           } else if (snapshot.hasError) {
                             return const Icon(Icons.error);
@@ -223,7 +229,8 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
                                 snapshot.data!,
                                 fit: BoxFit.scaleDown,
                                 colorFilter: kebabPlace.status == 'zamknięte'
-                                    ? const ColorFilter.mode(Colors.grey, BlendMode.srcIn)
+                                    ? const ColorFilter.mode(
+                                        Colors.grey, BlendMode.srcIn)
                                     : null,
                               ),
                             );
