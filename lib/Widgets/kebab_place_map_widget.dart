@@ -63,185 +63,270 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterMap(
-      options: MapOptions(
-        initialCenter: _initialPosition,
-        initialZoom: 13.0,
-      ),
+    final theme = Theme.of(context);
+    return Stack(
       children: [
-        TileLayer(
-          retinaMode: RetinaMode.isHighDensity(context),
-          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        ),
-        if (!_isLoading)
-          MarkerLayer(
-            markers: _kebabPlaces
-                .map(
-                  (kebabPlace) => Marker(
-                    width: 60.0,
-                    height: 60.0,
-                    point: LatLng(
-                      double.parse(kebabPlace.latitude!),
-                      double.parse(kebabPlace.longitude!),
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    kebabPlace.name,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.close),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            ),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Adres: ${kebabPlace.address}'),
-                                if (kebabPlace.googleMapsRating != null)
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Ocena: ${kebabPlace.googleMapsRating}',
-                                      ),
-                                      const SizedBox(width: 8.0),
-                                      RatingBarIndicator(
-                                        rating: double.parse(
-                                          kebabPlace.googleMapsRating!,
-                                        ),
-                                        itemBuilder: (context, index) =>
-                                            const Icon(
-                                          Icons.star,
-                                          color: Colors.amber,
-                                        ),
-                                        itemCount: 5,
-                                        itemSize: 20.0,
-                                        direction: Axis.horizontal,
-                                      ),
-                                    ],
-                                  ),
-                                if (kebabPlace.phone != null)
-                                  Text('Telefon: ${kebabPlace.phone}'),
-                                if (kebabPlace.website != null)
-                                  Text(
-                                    'Strona internetowa: ${kebabPlace.website}',
-                                  ),
-                                const SizedBox(height: 4.0),
-                                Row(
+        FlutterMap(
+          options: MapOptions(
+            initialCenter: _initialPosition,
+            initialZoom: 13.0,
+          ),
+          children: [
+            TileLayer(
+              retinaMode: RetinaMode.isHighDensity(context),
+              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            ),
+            if (!_isLoading)
+              MarkerLayer(
+                markers: _kebabPlaces
+                    .map(
+                      (kebabPlace) => Marker(
+                        width: 60.0,
+                        height: 60.0,
+                        point: LatLng(
+                          double.parse(kebabPlace.latitude!),
+                          double.parse(kebabPlace.longitude!),
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    if (kebabPlace.status == 'zamknięte')
-                                      const BadgeWidget(
-                                        text: 'Zamknięte',
-                                        color: Colors.red,
-                                        solid: true,
+                                    Expanded(
+                                      child: Text(
+                                        kebabPlace.name,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    if (kebabPlace.status == 'otwarte')
-                                      const BadgeWidget(
-                                        text: 'Otwarte',
-                                        color: Colors.green,
-                                        solid: true,
-                                      ),
-                                    if (kebabPlace.status == 'planowane')
-                                      const BadgeWidget(
-                                        text: 'Planowane',
-                                        color: Colors.orange,
-                                        solid: true,
-                                      ),
-                                    const SizedBox(width: 8.0),
-                                    if (kebabPlace.isCraft == true) ...[
-                                      const BadgeWidget(
-                                        text: 'Kraft',
-                                        color: Colors.purple,
-                                      ),
-                                      const SizedBox(width: 8.0),
-                                    ],
-                                    if (kebabPlace.openedAtYear != null) ...[
-                                      BadgeWidget(
-                                        text: 'Od ${kebabPlace.openedAtYear}',
-                                        color: Colors.deepOrangeAccent,
-                                      ),
-                                      const SizedBox(width: 8.0),
-                                    ],
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
                                   ],
                                 ),
-                              ],
-                            ),
-                            actions: [
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            KebabPlaceDetailsWidget(
-                                          kebabPlace: kebabPlace,
-                                          fillingRepository:
-                                              FillingRepositoryImpl(
-                                            FillingDataSource(
-                                              client: http.Client(),
-                                            ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Adres: ${kebabPlace.address}'),
+                                    if (kebabPlace.googleMapsRating != null)
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Ocena: ${kebabPlace.googleMapsRating}',
                                           ),
-                                          sauceRepository: SauceRepositoryImpl(
-                                            SauceDataSource(
-                                              client: http.Client(),
+                                          const SizedBox(width: 8.0),
+                                          RatingBarIndicator(
+                                            rating: double.parse(
+                                              kebabPlace.googleMapsRating!,
                                             ),
+                                            itemBuilder: (context, index) =>
+                                                const Icon(
+                                              Icons.star,
+                                              color: Colors.amber,
+                                            ),
+                                            itemCount: 5,
+                                            itemSize: 20.0,
+                                            direction: Axis.horizontal,
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    );
-                                  },
-                                  child: const Text('Zobacz szczegóły'),
+                                    if (kebabPlace.phone != null)
+                                      Text('Telefon: ${kebabPlace.phone}'),
+                                    if (kebabPlace.website != null)
+                                      Text(
+                                        'Strona internetowa: ${kebabPlace.website}',
+                                      ),
+                                    const SizedBox(height: 4.0),
+                                    Row(
+                                      children: [
+                                        if (kebabPlace.status == 'zamknięte')
+                                          const BadgeWidget(
+                                            text: 'Zamknięte',
+                                            color: Colors.red,
+                                            solid: true,
+                                          ),
+                                        if (kebabPlace.status == 'otwarte')
+                                          const BadgeWidget(
+                                            text: 'Otwarte',
+                                            color: Colors.green,
+                                            solid: true,
+                                          ),
+                                        if (kebabPlace.status == 'planowane')
+                                          const BadgeWidget(
+                                            text: 'Planowane',
+                                            color: Colors.orange,
+                                            solid: true,
+                                          ),
+                                        const SizedBox(width: 8.0),
+                                        if (kebabPlace.isCraft == true) ...[
+                                          const BadgeWidget(
+                                            text: 'Kraft',
+                                            color: Colors.purple,
+                                          ),
+                                          const SizedBox(width: 8.0),
+                                        ],
+                                        if (kebabPlace.openedAtYear !=
+                                            null) ...[
+                                          BadgeWidget(
+                                            text:
+                                                'Od ${kebabPlace.openedAtYear}',
+                                            color: Colors.deepOrangeAccent,
+                                          ),
+                                          const SizedBox(width: 8.0),
+                                        ],
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      child: FutureBuilder<String>(
-                        future: _loadSvgAsset('assets/kebab.svg'),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return const Icon(Icons.error);
-                          } else {
-                            return SizedBox(
-                              width: 5.0,
-                              height: 5.0,
-                              child: SvgPicture.string(
-                                snapshot.data!,
-                                fit: BoxFit.scaleDown,
-                                colorFilter: kebabPlace.status == 'zamknięte'
-                                    ? const ColorFilter.mode(
-                                        Colors.grey, BlendMode.srcIn)
-                                    : null,
+                                actions: [
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                KebabPlaceDetailsWidget(
+                                              kebabPlace: kebabPlace,
+                                              fillingRepository:
+                                                  FillingRepositoryImpl(
+                                                FillingDataSource(
+                                                  client: http.Client(),
+                                                ),
+                                              ),
+                                              sauceRepository:
+                                                  SauceRepositoryImpl(
+                                                SauceDataSource(
+                                                  client: http.Client(),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text('Zobacz szczegóły'),
+                                    ),
+                                  ),
+                                ],
                               ),
                             );
-                          }
-                        },
+                          },
+                          child: FutureBuilder<String>(
+                            future: _loadSvgAsset('assets/kebab.svg'),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return const Icon(Icons.error);
+                              } else {
+                                return SizedBox(
+                                  width: 5.0,
+                                  height: 5.0,
+                                  child: SvgPicture.string(
+                                    snapshot.data!,
+                                    fit: BoxFit.scaleDown,
+                                    colorFilter:
+                                        kebabPlace.status == 'zamknięte'
+                                            ? const ColorFilter.mode(
+                                                Colors.blueGrey,
+                                                BlendMode.srcIn,
+                                              )
+                                            : kebabPlace.status == 'planowane'
+                                                ? const ColorFilter.mode(
+                                                    Colors.deepPurple,
+                                                    BlendMode.srcIn,
+                                                  )
+                                                : null,
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+          ],
+        ),
+        Positioned(
+          bottom: 16.0,
+          right: 16.0,
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            color: theme.cardColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 24.0,
+                      height: 24.0,
+                      child: SvgPicture.asset(
+                        'assets/kebab.svg',
+                        colorFilter: const ColorFilter.mode(
+                          Colors.blueGrey,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
-                  ),
-                )
-                .toList(),
+                    const SizedBox(width: 4.0),
+                    Text('Zamknięte',
+                        style:
+                            TextStyle(color: theme.textTheme.bodyLarge?.color)),
+                  ],
+                ),
+                const SizedBox(height: 4.0),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 24.0,
+                      height: 24.0,
+                      child: SvgPicture.asset(
+                        'assets/kebab.svg',
+                        colorFilter: const ColorFilter.mode(
+                          Colors.deepPurple,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4.0),
+                    Text('Planowane',
+                        style:
+                            TextStyle(color: theme.textTheme.bodyLarge?.color)),
+                  ],
+                ),
+                const SizedBox(height: 4.0),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 24.0,
+                      height: 24.0,
+                      child: SvgPicture.asset(
+                        'assets/kebab.svg',
+                      ),
+                    ),
+                    const SizedBox(width: 4.0),
+                    Text('Otwarte',
+                        style:
+                            TextStyle(color: theme.textTheme.bodyLarge?.color)),
+                  ],
+                ),
+              ],
+            ),
           ),
+        ),
       ],
     );
   }
