@@ -6,12 +6,14 @@ import 'package:kula_mobile/Data/Data_sources/kebab_place_data_source.dart';
 import 'package:kula_mobile/Data/Repositories/kebab_place_repository_impl.dart';
 import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'badge_widget.dart';
 import 'kebab_place_details_widget.dart';
 import 'package:kula_mobile/Data/Data_sources/filling_data_source.dart';
 import 'package:kula_mobile/Data/Data_sources/sauce_data_source.dart';
 import 'package:kula_mobile/Data/Repositories/filling_repository_impl.dart';
 import 'package:kula_mobile/Data/Repositories/sauce_repository_impl.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class KebabPlaceMapWidget extends StatefulWidget {
   const KebabPlaceMapWidget({super.key});
@@ -53,6 +55,12 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
     }
   }
 
+  Future<String> _loadSvgAsset(String path) async {
+    String svgString = await rootBundle.loadString(path);
+    svgString = svgString.replaceAll('<sodipodi:namedview/>', '');
+    return svgString;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FlutterMap(
@@ -70,8 +78,8 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
             markers: _kebabPlaces
                 .map(
                   (kebabPlace) => Marker(
-                    width: 80.0,
-                    height: 80.0,
+                    width: 60.0,
+                    height: 60.0,
                     point: LatLng(
                       double.parse(kebabPlace.latitude!),
                       double.parse(kebabPlace.longitude!),
@@ -200,10 +208,27 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
                           ),
                         );
                       },
-                      child: const Icon(
-                        Icons.fastfood,
-                        color: Colors.red,
-                        size: 25.0,
+                      child: FutureBuilder<String>(
+                        future: _loadSvgAsset('assets/kebab.svg'),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return const Icon(Icons.error);
+                          } else {
+                            return SizedBox(
+                              width: 5.0,
+                              height: 5.0,
+                              child: SvgPicture.string(
+                                snapshot.data!,
+                                fit: BoxFit.scaleDown,
+                                colorFilter: kebabPlace.status == 'zamknięte'
+                                    ? const ColorFilter.mode(Colors.grey, BlendMode.srcIn)
+                                    : null,
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ),
                   ),
