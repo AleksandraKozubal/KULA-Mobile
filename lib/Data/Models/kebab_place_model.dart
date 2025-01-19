@@ -25,6 +25,7 @@ class KebabPlaceModel {
   final List<Map<String, dynamic>> socialMedia;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  bool isFavorite;
 
   KebabPlaceModel({
     required this.id,
@@ -53,6 +54,7 @@ class KebabPlaceModel {
     this.isChainRestaurant,
     this.createdAt,
     this.updatedAt,
+    this.isFavorite = false,
   });
 
   factory KebabPlaceModel.fromJson(Map<String, dynamic> json) {
@@ -104,6 +106,7 @@ class KebabPlaceModel {
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'])
           : null,
+      isFavorite: json['is_favorite'] ?? false,
     );
   }
 
@@ -135,6 +138,7 @@ class KebabPlaceModel {
       'is_chain_restaurant': isChainRestaurant,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
+      'isFavorite': isFavorite,
     };
   }
 }

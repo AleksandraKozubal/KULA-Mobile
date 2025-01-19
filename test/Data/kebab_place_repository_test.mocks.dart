@@ -64,12 +64,18 @@ class MockKebabPlaceDataSource extends _i1.Mock
       ) as _i2.Client);
 
   @override
-  _i5.Future<Map<String, dynamic>> getKebabPlaces({int? page = 1}) =>
+  _i5.Future<Map<String, dynamic>> getKebabPlaces({
+    int? page = 1,
+    int? paginate,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #getKebabPlaces,
           [],
-          {#page: page},
+          {
+            #page: page,
+            #paginate: paginate,
+          },
         ),
         returnValue:
             _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),

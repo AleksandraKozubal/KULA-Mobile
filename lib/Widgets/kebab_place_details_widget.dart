@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:kula_mobile/Data/Data_sources/login_data_source.dart';
+import 'package:kula_mobile/Data/Data_sources/logout_data_source.dart';
+import 'package:kula_mobile/Data/Data_sources/register_data_source.dart';
 import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:kula_mobile/Data/Repositories/filling_repository_impl.dart';
 import 'package:kula_mobile/Data/Repositories/sauce_repository_impl.dart';
+import 'package:kula_mobile/Services/token_storage.dart';
 import 'package:kula_mobile/Widgets/badge_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:social_media_buttons/social_media_buttons.dart';
 import 'tiktok_social_media_button.dart';
+import 'package:kula_mobile/Data/Repositories/favorite_repository_impl.dart';
+import 'package:kula_mobile/Data/Data_sources/favorite_data_source.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kula_mobile/Data/Data_sources/comment_data_source.dart';
+import 'package:kula_mobile/Data/Repositories/comment_repository_impl.dart';
+import 'package:kula_mobile/Data/Models/comment_model.dart';
+import 'package:kula_mobile/Data/Repositories/user_repository_impl.dart';
+import 'package:kula_mobile/Data/Data_sources/user_data_source.dart';
+import 'package:http/http.dart' as http;
+import 'package:kula_mobile/Data/Repositories/suggestion_repository_impl.dart';
+import 'package:kula_mobile/Data/Data_sources/suggestion_data_source.dart';
 
 class KebabPlaceDetailsWidget extends StatefulWidget {
   final KebabPlaceModel kebabPlace;
@@ -27,12 +42,52 @@ class KebabPlaceDetailsWidget extends StatefulWidget {
 class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
   late Future<Map<int, Map<String, String?>>> fillingsFuture;
   late Future<Map<int, Map<String, String?>>> saucesFuture;
+  late FavoriteRepositoryImpl favoriteRepository;
+  late CommentRepositoryImpl commentRepository;
+  late UserRepositoryImpl userRepository;
+  late SuggestionRepositoryImpl suggestionRepository;
+  late Future<List<CommentModel>> commentsFuture;
+  bool _isLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
+    final favoriteDataSource = FavoriteDataSource();
+    favoriteRepository =
+        FavoriteRepositoryImpl(favoriteDataSource: favoriteDataSource);
     fillingsFuture = _getFillings();
     saucesFuture = _getSauces();
+    _checkLoginStatus();
+    _loadFavoriteStatus();
+    final commentDataSource = CommentDataSource();
+    commentRepository =
+        CommentRepositoryImpl(commentDataSource: commentDataSource);
+    userRepository = UserRepositoryImpl(
+      userDataSource: UserDataSource(client: http.Client()),
+      registerDataSource: RegisterDataSource(client: http.Client()),
+      loginDataSource: LoginDataSource(client: http.Client()),
+      logoutDataSource: LogoutDataSource(client: http.Client()),
+    );
+    commentsFuture = _getComments();
+    final suggestionDataSource = SuggestionDataSource();
+    suggestionRepository =
+        SuggestionRepositoryImpl(suggestionDataSource: suggestionDataSource);
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final token = await TokenStorage.getToken();
+    setState(() {
+      _isLoggedIn = token != null;
+    });
+  }
+
+  Future<void> _loadFavoriteStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isFavorited = prefs.getBool('favorite_${widget.kebabPlace.id}') ??
+        widget.kebabPlace.isFavorite;
+    setState(() {
+      widget.kebabPlace.isFavorite = isFavorited;
+    });
   }
 
   Future<Map<int, Map<String, String?>>> _getFillings() async {
@@ -60,20 +115,218 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     }
   }
 
+  Future<void> _toggleFavorite() async {
+    try {
+      if (widget.kebabPlace.isFavorite) {
+        await favoriteRepository
+            .unfavoriteKebabPlace(widget.kebabPlace.id.toString());
+      } else {
+        await favoriteRepository
+            .favoriteKebabPlace(widget.kebabPlace.id.toString());
+      }
+      setState(() {
+        widget.kebabPlace.isFavorite = !widget.kebabPlace.isFavorite;
+      });
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(
+        'favorite_${widget.kebabPlace.id}',
+        widget.kebabPlace.isFavorite,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nie udało się zmienić statusu ulubionego kebaba'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<List<CommentModel>> _getComments() async {
+    return commentRepository.fetchComments(widget.kebabPlace.id);
+  }
+
+  Future<void> _addComment(String content) async {
+    await commentRepository.addComment(widget.kebabPlace.id, content);
+    setState(() {
+      commentsFuture = _getComments();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Komentarz został dodany'),
+      ),
+    );
+  }
+
+  Future<void> _editComment(int commentId, String content) async {
+    await commentRepository.editComment(commentId, content);
+    setState(() {
+      commentsFuture = _getComments();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Komentarz został zaktualizowany'),
+      ),
+    );
+  }
+
+  Future<void> _deleteComment(int commentId) async {
+    await commentRepository.deleteComment(commentId);
+    setState(() {
+      commentsFuture = _getComments();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Komentarz został usunięty'),
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteComment(int commentId) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Usuń komentarz'),
+          content: const Text('Czy na pewno chcesz usunąć ten komentarz?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Anuluj'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Usuń'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      await _deleteComment(commentId);
+    }
+  }
+
+  Future<void> _addSuggestion(String name, String description) async {
+    await suggestionRepository.addSuggestion(
+      widget.kebabPlace.id,
+      name,
+      description,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Sugestia została dodana'),
+      ),
+    );
+  }
+
+  void _showAddSuggestionDialog() {
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Dodaj Sugestię'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Temat',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Opis',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                final name = nameController.text;
+                final description = descriptionController.text;
+                _addSuggestion(name, description);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Dodaj'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddCommentDialog() {
+    final commentController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Dodaj Komentarz'),
+          content: TextField(
+            controller: commentController,
+            decoration: const InputDecoration(
+              labelText: 'Komentarz',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                final content = commentController.text;
+                _addComment(content);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Dodaj'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.kebabPlace.name),
+        actions: [
+          if (_isLoggedIn)
+            IconButton(
+              icon: Icon(
+                widget.kebabPlace.isFavorite
+                    ? Icons.favorite
+                    : Icons.favorite_border,
+              ),
+              onPressed: _toggleFavorite,
+            ),
+          if (_isLoggedIn)
+            IconButton(
+              icon: const Icon(Icons.warning),
+              onPressed: _showAddSuggestionDialog,
+            ),
+        ],
       ),
       body: FutureBuilder(
-        future: Future.wait([fillingsFuture, saucesFuture]),
+        future: Future.wait([fillingsFuture, saucesFuture, commentsFuture]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
+            final comments = snapshot.data![2] as List<CommentModel>;
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
@@ -303,6 +556,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                           );
                         }).toList(),
                       ),
+                      const SizedBox(height: 16),
                     ],
                     if (widget.kebabPlace.ios != null) ...[
                       const SizedBox(height: 8),
@@ -357,7 +611,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                         }).toList(),
                       ),
                     ],
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 16),
                     FutureBuilder<Map<int, Map<String, String?>>>(
                       future: fillingsFuture,
                       builder: (context, snapshot) {
@@ -408,7 +662,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                         }
                       },
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 16),
                     FutureBuilder<Map<int, Map<String, String?>>>(
                       future: saucesFuture,
                       builder: (context, snapshot) {
@@ -457,6 +711,92 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                             ],
                           );
                         }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Komentarze:',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    const SizedBox(height: 8),
+                    if (_isLoggedIn)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _showAddCommentDialog,
+                          child: const Text('Dodaj Komentarz'),
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        final comment = comments[index];
+                        return Column(
+                          children: [
+                            ListTile(
+                              title: Text(comment.content),
+                              subtitle: Text(comment.userName),
+                              trailing: _isLoggedIn && comment.isOwner
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                final controller =
+                                                    TextEditingController(
+                                                  text: comment.content,
+                                                );
+                                                return AlertDialog(
+                                                  title: const Text(
+                                                    'Edytuj komentarz',
+                                                  ),
+                                                  content: TextField(
+                                                    controller: controller,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText: 'Komentarz',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        _editComment(
+                                                          comment.id,
+                                                          controller.text,
+                                                        );
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      child:
+                                                          const Text('Zapisz'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () =>
+                                              _confirmDeleteComment(comment.id),
+                                        ),
+                                      ],
+                                    )
+                                  : null,
+                            ),
+                            const Divider(),
+                          ],
+                        );
                       },
                     ),
                   ],

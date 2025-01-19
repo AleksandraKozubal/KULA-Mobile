@@ -9,9 +9,60 @@ class KebabPlaceDataSource {
 
   KebabPlaceDataSource({required this.client});
 
-  Future<Map<String, dynamic>> getKebabPlaces({int page = 1}) async {
-    final response =
-        await client.get(Uri.parse('$apiUrl/kebab-places?page=$page'));
+  Future<Map<String, dynamic>> getKebabPlaces({
+    int page = 1,
+    int? paginate,
+    String? fchain,
+    String? fcraft,
+    String? fdatetime,
+    List<int>? ffillings,
+    String? flocation,
+    String? fopen,
+    String? fordering,
+    List<int>? fsauces,
+    String? fstatus,
+    String? sby,
+    String? sdirection,
+
+  }) async {
+    var url = '$apiUrl/kebab-places?page=$page';
+    if (paginate != null) {
+      url += '&paginate=$paginate';
+    }
+    if (fchain != null) {
+      url += '&fchain=$fchain';
+    }
+    if (fcraft != null) {
+      url += '&fcraft=$fcraft';
+    }
+    if (fdatetime != null) {
+      url += '&fdatetime=$fdatetime';
+    }
+    if (ffillings != null) {
+      url += '&ffillings=[${ffillings.join(',')}]';
+    }
+    if (flocation != null) {
+      url += '&flocation=$flocation';
+    }
+    if (fopen != null) {
+      url += '&fopen=$fopen';
+    }
+    if (fordering != null) {
+      url += '&fordering=$fordering';
+    }
+    if (fsauces != null) {
+      url += '&fsauces=[${fsauces.join(',')}]';
+    }
+    if (fstatus != null) {
+      url += '&fstatus=$fstatus';
+    }
+    if (sby != null) {
+      url += '&sby=$sby';
+    }
+    if (sdirection != null) {
+      url += '&sdirection=$sdirection';
+    }
+    final response = await client.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       final List<dynamic> data = jsonResponse['data'];

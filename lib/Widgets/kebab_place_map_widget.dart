@@ -37,7 +37,7 @@ class _KebabPlaceMapWidgetState extends State<KebabPlaceMapWidget> {
     try {
       final response = await KebabPlaceRepositoryImpl(
         KebabPlaceDataSource(client: http.Client()),
-      ).getKebabPlaces(page: page);
+      ).getKebabPlaces(page: page, paginate: 1000);
       setState(() {
         _kebabPlaces = response['data'];
         _isLoading = false;
