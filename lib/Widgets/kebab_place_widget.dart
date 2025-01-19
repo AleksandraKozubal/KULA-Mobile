@@ -12,8 +12,14 @@ import 'package:kula_mobile/Data/Data_sources/sauce_data_source.dart';
 import 'badge_widget.dart';
 
 class KebabPlaceWidget extends StatefulWidget {
-  const KebabPlaceWidget({super.key});
+  final FillingRepositoryImpl fillingRepository;
+  final SauceRepositoryImpl sauceRepository;
 
+  const KebabPlaceWidget({
+    required this.fillingRepository,
+    required this.sauceRepository,
+    super.key,
+    });
   @override
   KebabPlaceWidgetState createState() => KebabPlaceWidgetState();
 }
@@ -64,6 +70,22 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
     }
   }
 
+  Future<Map<int, Map<String, String?>>> _getFillings() async {
+    final fillings = await widget.fillingRepository.getFillings();
+    return {
+      for (var filling in fillings)
+        filling.id: {'name': filling.name, 'hexColor': filling.hexColor},
+    };
+  }
+
+  Future<Map<int, Map<String, String?>>> _getSauces() async {
+    final sauces = await widget.sauceRepository.getSauces();
+    return {
+      for (var sauce in sauces)
+        sauce.id: {'name': sauce.name, 'hexColor': sauce.hexColor},
+    };
+  }
+
   void _previousPage() {
     if (_currentPage > 1) {
       setState(() {
@@ -86,7 +108,6 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,9 +122,11 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
           ),
           Builder(
             builder: (context) => IconButton(
-              icon: const Icon(Icons.filter_list),
+              icon: const Icon(Icons.filter_alt),
               onPressed: () {
                 Scaffold.of(context).openEndDrawer();
+                _getFillings();
+                _getSauces();
               },
             ),
           ),
