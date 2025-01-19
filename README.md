@@ -40,3 +40,11 @@ flutter run
 ```shell
 flutter pub get
 ```
+- To analyze project for futher testing errors use:
+```shell
+flutter analyze
+```
+- To lint whole project use:
+```shell
+dart format .
+```
