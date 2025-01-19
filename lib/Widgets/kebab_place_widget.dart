@@ -99,7 +99,13 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
             child:
                 BadgeWidget(text: 'Razem: $_totalKebabs', color: Colors.white),
           ),
-          const EndDrawerButton(
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.filter_list),
+              onPressed: () {
+                Scaffold.of(context).openEndDrawer();
+              },
+            ),
           ),
         ],
       ),
