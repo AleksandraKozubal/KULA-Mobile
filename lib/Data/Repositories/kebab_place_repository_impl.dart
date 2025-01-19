@@ -6,8 +6,11 @@ class KebabPlaceRepositoryImpl {
 
   KebabPlaceRepositoryImpl(this._dataSource);
 
-  Future<Map<String, dynamic>> getKebabPlaces({required int page, String sby = 'id', String sdirection = 'asc', String? ffillings, String? fsauces, bool? fkraft, int? paginate}) async {
-    return await _dataSource.getKebabPlaces(page: page, sby: sby, sdirection: sdirection, ffillings: ffillings, fsauces: fsauces, fkraft: fkraft, paginate: paginate);
+  Future<Map<String, dynamic>> getKebabPlaces({
+    required int page,
+    int? paginate,
+  }) async {
+    return await _dataSource.getKebabPlaces(page: page, paginate: paginate);
   }
 
   Future<KebabPlaceModel> getKebabPlace(int id) async {

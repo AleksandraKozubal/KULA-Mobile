@@ -22,6 +22,11 @@ KULA-Mobile is a mobile application designed to help users locate and explore ke
 
 ## Local development
 
+Create .env from example .env (for Android local development use http://10.0.2.2:63251/api )
+```
+cp .env.example .env
+```
+
 Useful commands: 
 - To check if your project is setup properly use:
 ```shell
@@ -34,4 +39,12 @@ flutter run
 - To get project's dependecies (packages) use:
 ```shell
 flutter pub get
+```
+- To analyze project for futher testing errors use:
+```shell
+flutter analyze
+```
+- To lint whole project use:
+```shell
+dart format .
 ```

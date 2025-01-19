@@ -1,23 +1,26 @@
-class SauceModel {
+class UserModel {
   final int id;
   final String name;
-  final String? hexColor;
+  final String email;
+  String? token;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  SauceModel({
+  UserModel({
     required this.id,
     required this.name,
-    this.hexColor,
+    required this.email,
+    this.token,
     this.createdAt,
     this.updatedAt,
   });
 
-  factory SauceModel.fromJson(Map<String, dynamic> json) {
-    return SauceModel(
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
       id: json['id'],
       name: json['name'],
-      hexColor: json['hex_color'],
+      email: json['email'],
+      token: json['token'],
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : null,
@@ -31,7 +34,8 @@ class SauceModel {
     return {
       'id': id,
       'name': name,
-      'hex_color': hexColor,
+      'email': email,
+      'token': token,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
