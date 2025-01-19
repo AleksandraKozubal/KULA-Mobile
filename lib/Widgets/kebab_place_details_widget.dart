@@ -151,6 +151,11 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     setState(() {
       commentsFuture = _getComments();
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Komentarz został dodany'),
+      ),
+    );
   }
 
   Future<void> _editComment(int commentId, String content) async {
@@ -158,6 +163,11 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     setState(() {
       commentsFuture = _getComments();
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Komentarz został zaktualizowany'),
+      ),
+    );
   }
 
   Future<void> _deleteComment(int commentId) async {
@@ -165,6 +175,37 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     setState(() {
       commentsFuture = _getComments();
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Komentarz został usunięty'),
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteComment(int commentId) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Usuń komentarz'),
+          content: const Text('Czy na pewno chcesz usunąć ten komentarz?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Anuluj'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Usuń'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      await _deleteComment(commentId);
+    }
   }
 
   Future<void> _addSuggestion(String name, String description) async {
@@ -215,6 +256,36 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                 final name = nameController.text;
                 final description = descriptionController.text;
                 _addSuggestion(name, description);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Dodaj'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddCommentDialog() {
+    final commentController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Dodaj Komentarz'),
+          content: TextField(
+            controller: commentController,
+            decoration: const InputDecoration(
+              labelText: 'Komentarz',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                final content = commentController.text;
+                _addComment(content);
                 Navigator.of(context).pop();
               },
               child: const Text('Dodaj'),
@@ -485,6 +556,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                           );
                         }).toList(),
                       ),
+                      const SizedBox(height: 16),
                     ],
                     if (widget.kebabPlace.ios != null) ...[
                       const SizedBox(height: 8),
@@ -539,7 +611,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                         }).toList(),
                       ),
                     ],
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 16),
                     FutureBuilder<Map<int, Map<String, String?>>>(
                       future: fillingsFuture,
                       builder: (context, snapshot) {
@@ -590,7 +662,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                         }
                       },
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 16),
                     FutureBuilder<Map<int, Map<String, String?>>>(
                       future: saucesFuture,
                       builder: (context, snapshot) {
@@ -641,21 +713,21 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                         }
                       },
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 16),
                     const Text(
                       'Komentarze:',
                       style: TextStyle(fontSize: 20),
                     ),
                     const SizedBox(height: 8),
                     if (_isLoggedIn)
-                      TextField(
-                        onSubmitted: _addComment,
-                        decoration: const InputDecoration(
-                          labelText: 'Dodaj komentarz',
-                          border: OutlineInputBorder(),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _showAddCommentDialog,
+                          child: const Text('Dodaj Komentarz'),
                         ),
                       ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 16),
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -716,7 +788,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                         IconButton(
                                           icon: const Icon(Icons.delete),
                                           onPressed: () =>
-                                              _deleteComment(comment.id),
+                                              _confirmDeleteComment(comment.id),
                                         ),
                                       ],
                                     )
