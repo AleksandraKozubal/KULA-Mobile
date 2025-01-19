@@ -4,6 +4,7 @@ import 'package:kula_mobile/Data/Data_sources/login_data_source.dart';
 import 'package:kula_mobile/Data/Data_sources/logout_data_source.dart';
 import 'package:kula_mobile/Data/Data_sources/register_data_source.dart';
 import 'Widgets/kebab_place_widget.dart';
+import 'Widgets/kebab_place_map_widget.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'Widgets/user_login_register_widget.dart';
 import 'package:kula_mobile/Services/token_storage.dart';
@@ -154,36 +155,6 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) {
-                    return const KebabPlaceWidget();
-                  },
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(1.0, 0.0);
-                    const end = Offset.zero;
-                    const curve = Curves.ease;
-
-                    final tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
-                    final offsetAnimation = animation.drive(tween);
-
-                    return SlideTransition(
-                      position: offsetAnimation,
-                      child: child,
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-        ],
       ),
       drawer: Drawer(
         width: 200,
@@ -251,7 +222,51 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      body: const Center(),
+      body: Stack(
+        children: [
+          const Center(
+            child: KebabPlaceMapWidget(),
+          ),
+          Positioned(
+            bottom: 16.0,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const KebabPlaceWidget();
+                      },
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(0.0, 1.0);
+                        const end = Offset.zero;
+                        const curve = Curves.ease;
+
+                        final tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        final offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: const Text('LISTA'),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
