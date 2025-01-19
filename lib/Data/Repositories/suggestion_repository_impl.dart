@@ -11,7 +11,10 @@ class SuggestionRepositoryImpl {
   }
 
   Future<void> addSuggestion(
-      int kebabPlaceId, String name, String description) {
+    int kebabPlaceId,
+    String name,
+    String description,
+  ) {
     return suggestionDataSource.addSuggestion(kebabPlaceId, name, description);
   }
 }

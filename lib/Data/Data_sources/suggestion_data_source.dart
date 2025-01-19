@@ -29,11 +29,15 @@ class SuggestionDataSource {
   }
 
   Future<void> addSuggestion(
-      int kebabPlaceId, String name, String description) async {
+    int kebabPlaceId,
+    String name,
+    String description,
+  ) async {
     final token = await TokenStorage.getToken();
     final response = await http.post(
       Uri.parse(
-          '$baseUrl/kebab-places/$kebabPlaceId/suggest?name=$name&description=$description&kebabPlace=$kebabPlaceId'),
+        '$baseUrl/kebab-places/$kebabPlaceId/suggest?name=$name&description=$description&kebabPlace=$kebabPlaceId',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

@@ -169,7 +169,10 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
 
   Future<void> _addSuggestion(String name, String description) async {
     await suggestionRepository.addSuggestion(
-        widget.kebabPlace.id, name, description);
+      widget.kebabPlace.id,
+      name,
+      description,
+    );
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Sugestia została dodana'),
