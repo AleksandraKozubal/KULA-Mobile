@@ -57,11 +57,12 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     _checkLoginStatus();
     _loadFavoriteStatus();
     final commentDataSource = CommentDataSource();
-    commentRepository = CommentRepositoryImpl(commentDataSource: commentDataSource);
+    commentRepository =
+        CommentRepositoryImpl(commentDataSource: commentDataSource);
     userRepository = UserRepositoryImpl(
-      userDataSource: UserDataSource(client: http.Client()), 
-      registerDataSource: RegisterDataSource(client: http.Client()), 
-      loginDataSource: LoginDataSource(client: http.Client()), 
+      userDataSource: UserDataSource(client: http.Client()),
+      registerDataSource: RegisterDataSource(client: http.Client()),
+      loginDataSource: LoginDataSource(client: http.Client()),
       logoutDataSource: LogoutDataSource(client: http.Client()),
     );
     commentsFuture = _getComments();
@@ -76,7 +77,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
 
   Future<void> _loadFavoriteStatus() async {
     final prefs = await SharedPreferences.getInstance();
-    final isFavorited = prefs.getBool('favorite_${widget.kebabPlace.id}') ?? widget.kebabPlace.isFavorite;
+    final isFavorited = prefs.getBool('favorite_${widget.kebabPlace.id}') ??
+        widget.kebabPlace.isFavorite;
     setState(() {
       widget.kebabPlace.isFavorite = isFavorited;
     });
@@ -120,7 +122,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
         widget.kebabPlace.isFavorite = !widget.kebabPlace.isFavorite;
       });
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('favorite_${widget.kebabPlace.id}', widget.kebabPlace.isFavorite);
+      await prefs.setBool(
+          'favorite_${widget.kebabPlace.id}', widget.kebabPlace.isFavorite);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -603,23 +606,31 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                             showDialog(
                                               context: context,
                                               builder: (context) {
-                                                final controller = TextEditingController(text: comment.content);
+                                                final controller =
+                                                    TextEditingController(
+                                                        text: comment.content);
                                                 return AlertDialog(
-                                                  title: const Text('Edytuj komentarz'),
+                                                  title: const Text(
+                                                      'Edytuj komentarz'),
                                                   content: TextField(
                                                     controller: controller,
-                                                    decoration: const InputDecoration(
+                                                    decoration:
+                                                        const InputDecoration(
                                                       labelText: 'Komentarz',
-                                                      border: OutlineInputBorder(),
+                                                      border:
+                                                          OutlineInputBorder(),
                                                     ),
                                                   ),
                                                   actions: [
                                                     TextButton(
                                                       onPressed: () {
-                                                        _editComment(comment.id, controller.text);
-                                                        Navigator.of(context).pop();
+                                                        _editComment(comment.id,
+                                                            controller.text);
+                                                        Navigator.of(context)
+                                                            .pop();
                                                       },
-                                                      child: const Text('Zapisz'),
+                                                      child:
+                                                          const Text('Zapisz'),
                                                     ),
                                                   ],
                                                 );
@@ -629,7 +640,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.delete),
-                                          onPressed: () => _deleteComment(comment.id),
+                                          onPressed: () =>
+                                              _deleteComment(comment.id),
                                         ),
                                       ],
                                     )
