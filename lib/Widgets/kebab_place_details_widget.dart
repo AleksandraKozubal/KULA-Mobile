@@ -37,7 +37,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
   void initState() {
     super.initState();
     final favoriteDataSource = FavoriteDataSource();
-    favoriteRepository = FavoriteRepositoryImpl(favoriteDataSource: favoriteDataSource);
+    favoriteRepository =
+        FavoriteRepositoryImpl(favoriteDataSource: favoriteDataSource);
     fillingsFuture = _getFillings();
     saucesFuture = _getSauces();
     _checkLoginStatus();
@@ -53,7 +54,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
 
   Future<void> _checkIfFavorited() async {
     if (_isLoggedIn) {
-      final isFavorited = await favoriteRepository.isKebabPlaceFavorited(widget.kebabPlace.id.toString());
+      final isFavorited = await favoriteRepository
+          .isKebabPlaceFavorited(widget.kebabPlace.id.toString());
       setState(() {
         widget.kebabPlace.isFavorite = isFavorited;
       });
@@ -88,9 +90,11 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
   Future<void> _toggleFavorite() async {
     try {
       if (widget.kebabPlace.isFavorite) {
-        await favoriteRepository.unfavoriteKebabPlace(widget.kebabPlace.id.toString());
+        await favoriteRepository
+            .unfavoriteKebabPlace(widget.kebabPlace.id.toString());
       } else {
-        await favoriteRepository.favoriteKebabPlace(widget.kebabPlace.id.toString());
+        await favoriteRepository
+            .favoriteKebabPlace(widget.kebabPlace.id.toString());
       }
       setState(() {
         widget.kebabPlace.isFavorite = !widget.kebabPlace.isFavorite;
@@ -114,7 +118,9 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
           if (_isLoggedIn)
             IconButton(
               icon: Icon(
-                widget.kebabPlace.isFavorite ? Icons.favorite : Icons.favorite_border,
+                widget.kebabPlace.isFavorite
+                    ? Icons.favorite
+                    : Icons.favorite_border,
               ),
               onPressed: _toggleFavorite,
             ),

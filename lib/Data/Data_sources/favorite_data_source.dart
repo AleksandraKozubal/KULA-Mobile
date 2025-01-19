@@ -16,7 +16,6 @@ class FavoriteDataSource {
         'Content-Type': 'application/json',
       },
     );
-    print('Favorite response: ${response.statusCode} ${response.body}');
     if (response.statusCode == 409) {
       return false; // Conflict, already favorited
     } else if (response.statusCode != 201) {
@@ -31,10 +30,8 @@ class FavoriteDataSource {
       Uri.parse('$baseUrl/kebab-places/$id/unfav'),
       headers: {
         'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
       },
     );
-    print('Unfavorite response: ${response.statusCode} ${response.body}');
     if (response.statusCode != 200) {
       throw Exception('Failed to unfavorite kebab place');
     }
@@ -49,7 +46,6 @@ class FavoriteDataSource {
         'Content-Type': 'application/json',
       },
     );
-    print('Is Favorited response: ${response.statusCode} ${response.body}');
     if (response.statusCode != 200) {
       throw Exception('Failed to check if kebab place is favorited');
     }
