@@ -10,6 +10,7 @@ import 'package:social_media_buttons/social_media_buttons.dart';
 import 'tiktok_social_media_button.dart';
 import 'package:kula_mobile/Data/Repositories/favorite_repository_impl.dart';
 import 'package:kula_mobile/Data/Data_sources/favorite_data_source.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class KebabPlaceDetailsWidget extends StatefulWidget {
   final KebabPlaceModel kebabPlace;
@@ -42,7 +43,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     fillingsFuture = _getFillings();
     saucesFuture = _getSauces();
     _checkLoginStatus();
-    _checkIfFavorited();
+    _loadFavoriteStatus();
   }
 
   Future<void> _checkLoginStatus() async {
@@ -52,14 +53,12 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     });
   }
 
-  Future<void> _checkIfFavorited() async {
-    if (_isLoggedIn) {
-      final isFavorited = await favoriteRepository
-          .isKebabPlaceFavorited(widget.kebabPlace.id.toString());
-      setState(() {
-        widget.kebabPlace.isFavorite = isFavorited;
-      });
-    }
+  Future<void> _loadFavoriteStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isFavorited = prefs.getBool('favorite_${widget.kebabPlace.id}') ?? widget.kebabPlace.isFavorite;
+    setState(() {
+      widget.kebabPlace.isFavorite = isFavorited;
+    });
   }
 
   Future<Map<int, Map<String, String?>>> _getFillings() async {
@@ -99,6 +98,8 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
       setState(() {
         widget.kebabPlace.isFavorite = !widget.kebabPlace.isFavorite;
       });
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('favorite_${widget.kebabPlace.id}', widget.kebabPlace.isFavorite);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
