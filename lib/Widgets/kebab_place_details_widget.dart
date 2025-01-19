@@ -3,10 +3,13 @@ import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:kula_mobile/Data/Repositories/filling_repository_impl.dart';
 import 'package:kula_mobile/Data/Repositories/sauce_repository_impl.dart';
+import 'package:kula_mobile/Services/token_storage.dart';
 import 'package:kula_mobile/Widgets/badge_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:social_media_buttons/social_media_buttons.dart';
 import 'tiktok_social_media_button.dart';
+import 'package:kula_mobile/Data/Repositories/favorite_repository_impl.dart';
+import 'package:kula_mobile/Data/Data_sources/favorite_data_source.dart';
 
 class KebabPlaceDetailsWidget extends StatefulWidget {
   final KebabPlaceModel kebabPlace;
@@ -27,12 +30,34 @@ class KebabPlaceDetailsWidget extends StatefulWidget {
 class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
   late Future<Map<int, Map<String, String?>>> fillingsFuture;
   late Future<Map<int, Map<String, String?>>> saucesFuture;
+  late FavoriteRepositoryImpl favoriteRepository;
+  bool _isLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
+    final favoriteDataSource = FavoriteDataSource();
+    favoriteRepository = FavoriteRepositoryImpl(favoriteDataSource: favoriteDataSource);
     fillingsFuture = _getFillings();
     saucesFuture = _getSauces();
+    _checkLoginStatus();
+    _checkIfFavorited();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final token = await TokenStorage.getToken();
+    setState(() {
+      _isLoggedIn = token != null;
+    });
+  }
+
+  Future<void> _checkIfFavorited() async {
+    if (_isLoggedIn) {
+      final isFavorited = await favoriteRepository.isKebabPlaceFavorited(widget.kebabPlace.id.toString());
+      setState(() {
+        widget.kebabPlace.isFavorite = isFavorited;
+      });
+    }
   }
 
   Future<Map<int, Map<String, String?>>> _getFillings() async {
@@ -60,11 +85,40 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     }
   }
 
+  Future<void> _toggleFavorite() async {
+    try {
+      if (widget.kebabPlace.isFavorite) {
+        await favoriteRepository.unfavoriteKebabPlace(widget.kebabPlace.id.toString());
+      } else {
+        await favoriteRepository.favoriteKebabPlace(widget.kebabPlace.id.toString());
+      }
+      setState(() {
+        widget.kebabPlace.isFavorite = !widget.kebabPlace.isFavorite;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nie udało się zmienić statusu ulubionego kebaba'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.kebabPlace.name),
+        actions: [
+          if (_isLoggedIn)
+            IconButton(
+              icon: Icon(
+                widget.kebabPlace.isFavorite ? Icons.favorite : Icons.favorite_border,
+              ),
+              onPressed: _toggleFavorite,
+            ),
+        ],
       ),
       body: FutureBuilder(
         future: Future.wait([fillingsFuture, saucesFuture]),
