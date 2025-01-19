@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kula_mobile/Data/Data_sources/login_data_source.dart';
+import 'package:kula_mobile/Data/Data_sources/logout_data_source.dart';
+import 'package:kula_mobile/Data/Data_sources/register_data_source.dart';
 import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:kula_mobile/Data/Repositories/filling_repository_impl.dart';
@@ -11,6 +14,12 @@ import 'tiktok_social_media_button.dart';
 import 'package:kula_mobile/Data/Repositories/favorite_repository_impl.dart';
 import 'package:kula_mobile/Data/Data_sources/favorite_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kula_mobile/Data/Data_sources/comment_data_source.dart';
+import 'package:kula_mobile/Data/Repositories/comment_repository_impl.dart';
+import 'package:kula_mobile/Data/Models/comment_model.dart';
+import 'package:kula_mobile/Data/Repositories/user_repository_impl.dart';
+import 'package:kula_mobile/Data/Data_sources/user_data_source.dart';
+import 'package:http/http.dart' as http;
 
 class KebabPlaceDetailsWidget extends StatefulWidget {
   final KebabPlaceModel kebabPlace;
@@ -32,6 +41,9 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
   late Future<Map<int, Map<String, String?>>> fillingsFuture;
   late Future<Map<int, Map<String, String?>>> saucesFuture;
   late FavoriteRepositoryImpl favoriteRepository;
+  late CommentRepositoryImpl commentRepository;
+  late UserRepositoryImpl userRepository;
+  late Future<List<CommentModel>> commentsFuture;
   bool _isLoggedIn = false;
 
   @override
@@ -44,6 +56,15 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     saucesFuture = _getSauces();
     _checkLoginStatus();
     _loadFavoriteStatus();
+    final commentDataSource = CommentDataSource();
+    commentRepository = CommentRepositoryImpl(commentDataSource: commentDataSource);
+    userRepository = UserRepositoryImpl(
+      userDataSource: UserDataSource(client: http.Client()), 
+      registerDataSource: RegisterDataSource(client: http.Client()), 
+      loginDataSource: LoginDataSource(client: http.Client()), 
+      logoutDataSource: LogoutDataSource(client: http.Client()),
+    );
+    commentsFuture = _getComments();
   }
 
   Future<void> _checkLoginStatus() async {
@@ -110,6 +131,31 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
     }
   }
 
+  Future<List<CommentModel>> _getComments() async {
+    return commentRepository.fetchComments(widget.kebabPlace.id);
+  }
+
+  Future<void> _addComment(String content) async {
+    await commentRepository.addComment(widget.kebabPlace.id, content);
+    setState(() {
+      commentsFuture = _getComments();
+    });
+  }
+
+  Future<void> _editComment(int commentId, String content) async {
+    await commentRepository.editComment(commentId, content);
+    setState(() {
+      commentsFuture = _getComments();
+    });
+  }
+
+  Future<void> _deleteComment(int commentId) async {
+    await commentRepository.deleteComment(commentId);
+    setState(() {
+      commentsFuture = _getComments();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,13 +174,14 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
         ],
       ),
       body: FutureBuilder(
-        future: Future.wait([fillingsFuture, saucesFuture]),
+        future: Future.wait([fillingsFuture, saucesFuture, commentsFuture]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
+            final comments = snapshot.data![2] as List<CommentModel>;
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
@@ -518,6 +565,79 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                             ],
                           );
                         }
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Komentarze:',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    const SizedBox(height: 8),
+                    if (_isLoggedIn)
+                      TextField(
+                        onSubmitted: _addComment,
+                        decoration: const InputDecoration(
+                          labelText: 'Dodaj komentarz',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        final comment = comments[index];
+                        return Column(
+                          children: [
+                            ListTile(
+                              title: Text(comment.content),
+                              subtitle: Text(comment.userName),
+                              trailing: _isLoggedIn && comment.isOwner
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                final controller = TextEditingController(text: comment.content);
+                                                return AlertDialog(
+                                                  title: const Text('Edytuj komentarz'),
+                                                  content: TextField(
+                                                    controller: controller,
+                                                    decoration: const InputDecoration(
+                                                      labelText: 'Komentarz',
+                                                      border: OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        _editComment(comment.id, controller.text);
+                                                        Navigator.of(context).pop();
+                                                      },
+                                                      child: const Text('Zapisz'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () => _deleteComment(comment.id),
+                                        ),
+                                      ],
+                                    )
+                                  : null,
+                            ),
+                            const Divider(),
+                          ],
+                        );
                       },
                     ),
                   ],
