@@ -9,8 +9,10 @@ class KebabPlaceDataSource {
 
   KebabPlaceDataSource({required this.client});
 
-  Future<Map<String, dynamic>> getKebabPlaces(
-      {int page = 1, int? paginate}) async {
+  Future<Map<String, dynamic>> getKebabPlaces({
+    int page = 1,
+    int? paginate,
+  }) async {
     var url = '$apiUrl/kebab-places?page=$page';
     if (paginate != null) {
       url += '&paginate=$paginate';
