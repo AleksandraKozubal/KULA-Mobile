@@ -86,6 +86,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +99,62 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
             child:
                 BadgeWidget(text: 'Razem: $_totalKebabs', color: Colors.white),
           ),
+          const EndDrawerButton(
+          ),
         ],
+      ),
+      endDrawer: Drawer(
+        child: ListView(
+          children: const [
+            DrawerHeader(
+              child: Text('Filtruj i sortuj'),
+            ),
+            ListTile(
+              title: Column(
+                children: [
+                  Text('Filtruj po'),
+                  ListTile(
+                    title: BadgeWidget(
+                      text: 'Sieć',
+                      color: Colors.deepPurpleAccent,
+                      solid: true,
+                    ),
+                  ),
+                  ListTile(
+                    title: Text('Kraft'),
+                  ),
+                  ListTile(
+                    title: Text('Data otwarcia'),
+                  ),
+                  ListTile(
+                    title: Text('Lokalizacja'),
+                  ),
+                  ListTile(
+                    title: Text('Status'),
+                  ),
+                  ListTile(
+                    title: Text('Otwarte'),
+                  ),
+                  ListTile(
+                    title: Text('Zamknięte'),
+                  ),
+                  ListTile(
+                    title: Text('Planowane'),
+                  ),
+                  ListTile(
+                    title: Text('Sosy'),
+                  ),
+                  ListTile(
+                    title: Text('Składniki'),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              title: Text('Sortuj po'),
+            ),
+          ],
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
