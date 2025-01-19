@@ -13,6 +13,7 @@ import 'package:kula_mobile/Data/Repositories/user_repository_impl.dart';
 import 'package:kula_mobile/Data/Data_sources/user_data_source.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Widgets/suggestion_widget.dart';
 
 Future<void> main() async {
   await dotenv.load();
@@ -195,6 +196,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         ._checkLoggedInUser();
                     setState(() {});
                   });
+                },
+              ),
+            if (widget.loggedInUser != null)
+              ListTile(
+                leading: const Icon(Icons.list),
+                title: const Text('Moje Sugestie'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SuggestionWidget(),
+                    ),
+                  );
                 },
               ),
             ListTile(
