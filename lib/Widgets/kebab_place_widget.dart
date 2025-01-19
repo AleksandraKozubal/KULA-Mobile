@@ -31,6 +31,25 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
   int _totalPages = 1;
   int _totalKebabs = 0;
 
+  final Map<String, bool> _badgeStates = {
+    'Sieć': false,
+    'Kraft': false,
+    'Data otwarcia': false,
+    'Lokalizacja': false,
+    'Status': false,
+    'Otwarte': false,
+    'Zamknięte': false,
+    'Planowane': false,
+    'Sosy': false,
+    'Składniki': false,
+  };
+
+  void _toggleBadge(String key) {
+    setState(() {
+      _badgeStates[key] = !_badgeStates[key]!;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -134,52 +153,118 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
       ),
       endDrawer: Drawer(
         child: ListView(
-          children: const [
-            DrawerHeader(
+          children: [
+            const DrawerHeader(
               child: Text('Filtruj i sortuj'),
             ),
             ListTile(
               title: Column(
                 children: [
-                  Text('Filtruj po'),
+                  const Text('Filtruj po'),
                   ListTile(
-                    title: BadgeWidget(
-                      text: 'Sieć',
-                      color: Colors.deepPurpleAccent,
-                      solid: true,
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Sieć'),
+                      child: BadgeWidget(
+                        text: 'Sieć',
+                        color: Colors.deepPurpleAccent,
+                        solid: _badgeStates['Sieć']!,
+                      ),
                     ),
                   ),
                   ListTile(
-                    title: Text('Kraft'),
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Kraft'),
+                      child: BadgeWidget(
+                        text: 'Kraft',
+                        color: Colors.blue,
+                        solid: _badgeStates['Kraft']!,
+                      ),
+                    ),
                   ),
                   ListTile(
-                    title: Text('Data otwarcia'),
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Data otwarcia'),
+                      child: BadgeWidget(
+                        text: 'Data otwarcia',
+                        color: Colors.teal,
+                        solid: _badgeStates['Data otwarcia']!,
+                      ),
+                    ),
                   ),
                   ListTile(
-                    title: Text('Lokalizacja'),
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Lokalizacja'),
+                      child: BadgeWidget(
+                        text: 'Lokalizacja',
+                        color: Colors.cyan,
+                        solid: _badgeStates['Lokalizacja']!,
+                      ),
+                    ),
                   ),
                   ListTile(
-                    title: Text('Status'),
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Status'),
+                      child: BadgeWidget(
+                        text: 'Status',
+                        color: Colors.indigo,
+                        solid: _badgeStates['Status']!,
+                      ),
+                    ),
                   ),
                   ListTile(
-                    title: Text('Otwarte'),
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Otwarte'),
+                      child: BadgeWidget(
+                        text: 'Otwarte',
+                        color: Colors.green,
+                        solid: _badgeStates['Otwarte']!,
+                      ),
+                    ),
                   ),
                   ListTile(
-                    title: Text('Zamknięte'),
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Zamknięte'),
+                      child: BadgeWidget(
+                        text: 'Zamknięte',
+                        color: Colors.red,
+                        solid: _badgeStates['Zamknięte']!,
+                      ),
+                    ),
                   ),
                   ListTile(
-                    title: Text('Planowane'),
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Planowane'),
+                      child: BadgeWidget(
+                        text: 'Planowane',
+                        color: Colors.orange,
+                        solid: _badgeStates['Planowane']!,
+                      ),
+                    ),
                   ),
                   ListTile(
-                    title: Text('Sosy'),
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Sosy'),
+                      child: BadgeWidget(
+                        text: 'Sosy',
+                        color: Colors.pink,
+                        solid: _badgeStates['Sosy']!,
+                      ),
+                    ),
                   ),
                   ListTile(
-                    title: Text('Składniki'),
+                    title: GestureDetector(
+                      onTap: () => _toggleBadge('Składniki'),
+                      child: BadgeWidget(
+                        text: 'Składniki',
+                        color: Colors.brown,
+                        solid: _badgeStates['Składniki']!,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            ListTile(
+            const ListTile(
               title: Text('Sortuj po'),
             ),
           ],
