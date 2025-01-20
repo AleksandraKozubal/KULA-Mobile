@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:kula_mobile/Data/Data_sources/filling_data_source.dart';
 import 'package:kula_mobile/Data/Data_sources/login_data_source.dart';
+import 'package:kula_mobile/Data/Data_sources/sauce_data_source.dart';
+import 'package:kula_mobile/Data/Repositories/filling_repository_impl.dart';
 import 'package:kula_mobile/Data/Data_sources/logout_data_source.dart';
 import 'package:kula_mobile/Data/Data_sources/register_data_source.dart';
+import 'package:kula_mobile/Data/Repositories/sauce_repository_impl.dart';
 import 'Widgets/kebab_place_widget.dart';
 import 'Widgets/kebab_place_map_widget.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -256,7 +260,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) {
-                        return const KebabPlaceWidget();
+                        return KebabPlaceWidget(
+                          fillingRepository: FillingRepositoryImpl(FillingDataSource(client: http.Client())),
+                          sauceRepository: SauceRepositoryImpl(SauceDataSource(client: http.Client())),
+                        );
                       },
                       transitionsBuilder:
                           (context, animation, secondaryAnimation, child) {

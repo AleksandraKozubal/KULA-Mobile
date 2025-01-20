@@ -30,6 +30,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
   int _currentPage = 1;
   int _totalPages = 1;
   int _totalKebabs = 0;
+  late Future<Map<int, Map<String, String?>>> fillingsFuture;
+  late Future<Map<int, Map<String, String?>>> saucesFuture;
 
   final Map<String, bool> _badgeStates = {
     'Sieć': false,
@@ -54,6 +56,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
   void initState() {
     super.initState();
     _fetchKebabPlaces();
+    fillingsFuture = _getFillings();
+    saucesFuture = _getSauces();
   }
 
   @override
