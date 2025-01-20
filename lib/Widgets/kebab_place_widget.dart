@@ -203,6 +203,11 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
     }
   }
 
+  void _applyFilters() {
+    _fetchKebabPlaces();
+    Navigator.of(context).pop(); // Close the drawer
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -781,7 +786,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
               left: 16.0,
               right: 16.0,
               child: ElevatedButton(
-                onPressed: _fetchKebabPlaces,
+                onPressed: _applyFilters,
                 child: const Text('Zastosuj filtry'),
               ),
             ),
