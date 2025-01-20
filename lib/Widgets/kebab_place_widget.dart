@@ -205,7 +205,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
 
   void _applyFilters() {
     _fetchKebabPlaces();
-    Navigator.of(context).pop(); // Close the drawer
+    Navigator.of(context).pop();
   }
 
   @override
