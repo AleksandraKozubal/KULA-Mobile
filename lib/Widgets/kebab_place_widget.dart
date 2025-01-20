@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:kula_mobile/Data/Data_sources/kebab_place_data_source.dart';
-import 'package:kula_mobile/Data/Models/filling_model.dart';
 import 'package:kula_mobile/Data/Models/kebab_place_model.dart';
-import 'package:kula_mobile/Data/Models/sauce_model.dart';
 import 'package:kula_mobile/Data/Repositories/filling_repository_impl.dart';
 import 'package:kula_mobile/Data/Repositories/kebab_place_repository_impl.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -35,28 +33,61 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
   late Future<Map<int, Map<String, String?>>> fillingsFuture;
   late Future<Map<int, Map<String, String?>>> saucesFuture;
 
-  final Map<String, bool> _badgeStates = {
-    'Sieć': false,
-    'Kraft': false,
-    'Data otwarcia': false,
-    'Lokalizacja': false,
-    'Status': false,
-    'Otwarte': false,
-    'Zamknięte': false,
-    'Planowane': false,
-    'Sosy': false,
-    'Składniki': false,
-  };
+  final Map<String, dynamic> _filters = {};
+  String? _sortBy;
+  String? _sortDirection;
 
-  void _toggleBadge(String key) {
+  void _toggleBadge(String key, dynamic value) {
     setState(() {
-      _badgeStates[key] = !_badgeStates[key]!;
+      if (_filters.containsKey(key) && (_filters[key] is List)) {
+        if ((_filters[key] as List).contains(value)) {
+          (_filters[key] as List).remove(value);
+          if ((_filters[key] as List).isEmpty) {
+            _filters.remove(key);
+          }
+        } else {
+          (_filters[key] as List).add(value);
+        }
+      } else if (_filters.containsKey(key) && _filters[key] == value) {
+        _filters.remove(key);
+      } else {
+        if (key == 'Składniki' || key == 'Sosy') {
+          _filters[key] = [value];
+        } else if (key == 'Sieć' || key == 'Kraft') {
+          _filters[key] = value == 'Tak' ? 'true' : 'false';
+        } else if (key == 'Otwarte teraz') {
+          _filters['fopen'] = value == 'Tak' ? 'true' : 'false';
+        } else if (key == 'Pokaż wyników') {
+          _filters['paginate'] = int.parse(value);
+        } else {
+          _filters[key] = value.toString().toLowerCase();
+        }
+      }
+      _fetchKebabPlaces();
+    });
+  }
+
+  void _setSort(String sortBy, String direction) {
+    setState(() {
+      _sortBy = sortBy.toLowerCase();
+      _sortDirection = direction.toLowerCase();
+      _fetchKebabPlaces();
+    });
+  }
+
+  void _clearFilters() {
+    setState(() {
+      _filters.clear();
+      _fetchKebabPlaces();
     });
   }
 
   @override
   void initState() {
     super.initState();
+    _filters['paginate'] = 10;
+    _sortBy = 'id';
+    _sortDirection = 'asc';
     _fetchKebabPlaces();
     fillingsFuture = _getFillings();
     saucesFuture = _getSauces();
@@ -71,7 +102,22 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
     try {
       final response = await KebabPlaceRepositoryImpl(
         KebabPlaceDataSource(client: http.Client()),
-      ).getKebabPlaces(page: _currentPage, paginate: 10);
+      ).getKebabPlaces(
+        page: _currentPage,
+        paginate: _filters['paginate'] ?? 10,
+        fchain: _filters['Sieć'],
+        fcraft: _filters['Kraft'],
+        fdatetime: _filters['Data otwarcia'],
+        ffillings:
+            (_filters['Składniki'] as List?)?.map((e) => e as int).toList(),
+        flocation: _filters['Lokalizacja'],
+        fopen: _filters[''],
+        fordering: _filters['Sposoby zamawiania'],
+        fsauces: (_filters['Sosy'] as List?)?.map((e) => e as int).toList(),
+        fstatus: _filters['Status'],
+        sby: _sortBy,
+        sdirection: _sortDirection,
+      );
       setState(() {
         if (_currentPage == 1) {
           _kebabPlaces = response['data'];
@@ -160,376 +206,437 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
         ],
       ),
       endDrawer: Drawer(
-        child: FutureBuilder(
-          future: Future.wait([fillingsFuture, saucesFuture]),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            }
-            final fillings = snapshot.data![0];
-            final sauces = snapshot.data![1];
-            return ListView(
-              children: [
-                const DrawerHeader(
-                  child: Text('Filtruj i sortuj'),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
+              alignment: Alignment.bottomLeft,
+              padding: const EdgeInsets.all(16.0),
+              child: const Text(
+                'Filtrowanie i sortowanie',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
                 ),
-                ListTile(
-                  title: Column(
-                    children: [
-                      const Text('Filtry:'),
-                      const ListTile(
-                        title: Text('Składniki'),
+              ),
+            ),
+            FutureBuilder(
+              future: Future.wait([fillingsFuture, saucesFuture]),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+                final fillings = snapshot.data![0];
+                final sauces = snapshot.data![1];
+                return Column(
+                  children: [
+                    ListTile(
+                      title: ElevatedButton(
+                        onPressed: _clearFilters,
+                        child: const Text('Wyczyść filtry'),
                       ),
-                      ListTile(
-                        title: Column(
-                          children: fillings.entries
-                              .map(
-                                (entry) => ListTile(
-                                  title: GestureDetector(
-                                    onTap: () =>
-                                        _toggleBadge(entry.value['name']!),
-                                    child: BadgeWidget(
-                                      text: entry.value['name']!,
-                                      color: Colors.indigo,
-                                      solid:
-                                          _badgeStates[entry.value['name']] ??
-                                              false,
-                                    ),
-                                  ),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Ilość kebabów na stronie:'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Pokaż wyników', '10'),
+                            child: BadgeWidget(
+                              text: '10',
+                              color: Colors.blue,
+                              solid: _filters['paginate'] == 10,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Pokaż wyników', '20'),
+                            child: BadgeWidget(
+                              text: '20',
+                              color: Colors.blue,
+                              solid: _filters['paginate'] == 20,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Pokaż wyników', '50'),
+                            child: BadgeWidget(
+                              text: '50',
+                              color: Colors.blue,
+                              solid: _filters['paginate'] == 50,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Sortowanie:'),
+                    ),
+                    const ListTile(
+                      title: Text('Według'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _setSort('google_maps_rating', 'asc'),
+                            child: BadgeWidget(
+                              text: 'Ocena Google Maps',
+                              color: Colors.amber,
+                              solid: _sortBy == 'google_maps_rating' &&
+                                  _sortDirection == 'asc',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _setSort('name', 'asc'),
+                            child: BadgeWidget(
+                              text: 'Nazwa',
+                              color: Colors.black,
+                              solid:
+                                  _sortBy == 'name' && _sortDirection == 'asc',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _setSort('ID', 'asc'),
+                            child: BadgeWidget(
+                              text: 'Domyślne',
+                              color: Colors.black,
+                              solid: _sortBy == 'id' && _sortDirection == 'asc',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _setSort('opened_at_year', 'asc'),
+                            child: BadgeWidget(
+                              text: 'Data otwarcia',
+                              color: Colors.deepOrangeAccent,
+                              solid: _sortBy == 'opened_at_year' &&
+                                  _sortDirection == 'asc',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _setSort('closed_at_year', 'asc'),
+                            child: BadgeWidget(
+                              text: 'Data zamknięcia',
+                              color: Colors.deepOrangeAccent,
+                              solid: _sortBy == 'closed_at_year' &&
+                                  _sortDirection == 'asc',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Kierunek'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _setSort(_sortBy!, 'asc'),
+                            child: BadgeWidget(
+                              text: 'Rosnąco',
+                              color: Colors.green,
+                              solid: _sortDirection == 'asc',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _setSort(_sortBy!, 'desc'),
+                            child: BadgeWidget(
+                              text: 'Malejąco',
+                              color: Colors.red,
+                              solid: _sortDirection == 'desc',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Filtry:'),
+                    ),
+                    const ListTile(
+                      title: Text('Składniki'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: fillings.entries
+                            .map(
+                              (entry) => GestureDetector(
+                                onTap: () =>
+                                    _toggleBadge('Składniki', entry.key),
+                                child: BadgeWidget(
+                                  text: entry.value['name']!,
+                                  color: Colors.indigo,
+                                  solid: (_filters['Składniki'] as List?)
+                                          ?.contains(entry.key) ??
+                                      false,
                                 ),
-                              )
-                              .toList(),
-                        ),
+                              ),
+                            )
+                            .toList(),
                       ),
-                      const ListTile(
-                        title: Text('Sosy'),
-                      ),
-                      ListTile(
-                        title: Column(
-                          children: sauces.entries
-                              .map(
-                                (entry) => ListTile(
-                                  title: GestureDetector(
-                                    onTap: () =>
-                                        _toggleBadge(entry.value['name']!),
-                                    child: BadgeWidget(
-                                      text: entry.value['name']!,
-                                      color: Colors.pink,
-                                      solid:
-                                          _badgeStates[entry.value['name']] ??
-                                              false,
-                                    ),
-                                  ),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Sosy'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: sauces.entries
+                            .map(
+                              (entry) => GestureDetector(
+                                onTap: () => _toggleBadge('Sosy', entry.key),
+                                child: BadgeWidget(
+                                  text: entry.value['name']!,
+                                  color: Colors.pink,
+                                  solid: (_filters['Sosy'] as List?)
+                                          ?.contains(entry.key) ??
+                                      false,
                                 ),
-                              )
-                              .toList(),
-                        ),
+                              ),
+                            )
+                            .toList(),
                       ),
-                      const ListTile(
-                        title: Text('Sieć'),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Sieć'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Sieć', 'Tak'),
+                            child: BadgeWidget(
+                              text: 'Tak',
+                              color: Colors.blue,
+                              solid: _filters['Sieć'] == 'true',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Sieć', 'Nie'),
+                            child: BadgeWidget(
+                              text: 'Nie',
+                              color: Colors.grey,
+                              solid: _filters['Sieć'] == 'false',
+                            ),
+                          ),
+                        ],
                       ),
-                      ListTile(
-                        title: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Sieć'),
-                              child: BadgeWidget(
-                                text: 'Tak',
-                                color: Colors.blue,
-                                solid: _badgeStates['Sieć'] == true,
-                              ),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Status'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Status', 'Otwarte'),
+                            child: BadgeWidget(
+                              text: 'Otwarte',
+                              color: Colors.green,
+                              solid: _filters['Status'] == 'otwarte',
                             ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Sieć'),
-                              child: BadgeWidget(
-                                text: 'Nie',
-                                color: Colors.grey,
-                                solid: _badgeStates['Sieć'] == false,
-                              ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Status', 'Zamknięte'),
+                            child: BadgeWidget(
+                              text: 'Zamknięte',
+                              color: Colors.red,
+                              solid: _filters['Status'] == 'zamknięte',
                             ),
-                          ],
-                        ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Status', 'Planowane'),
+                            child: BadgeWidget(
+                              text: 'Planowane',
+                              color: Colors.orange,
+                              solid: _filters['Status'] == 'planowane',
+                            ),
+                          ),
+                        ],
                       ),
-                      const ListTile(
-                        title: Text('Status'),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Otwarte teraz'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Otwarte teraz', 'Tak'),
+                            child: BadgeWidget(
+                              text: 'Tak',
+                              color: Colors.green,
+                              solid: _filters['fopen'] == 'true',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Otwarte teraz', 'Nie'),
+                            child: BadgeWidget(
+                              text: 'Nie',
+                              color: Colors.red,
+                              solid: _filters['fopen'] == 'false',
+                            ),
+                          ),
+                        ],
                       ),
-                      ListTile(
-                        title: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Otwarte'),
-                              child: BadgeWidget(
-                                text: 'Otwarte',
-                                color: Colors.green,
-                                solid: _badgeStates['Otwarte'] ?? false,
-                              ),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Kraft'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Kraft', 'Tak'),
+                            child: BadgeWidget(
+                              text: 'Tak',
+                              color: Colors.purple,
+                              solid: _filters['Kraft'] == 'true',
                             ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Zamknięte'),
-                              child: BadgeWidget(
-                                text: 'Zamknięte',
-                                color: Colors.red,
-                                solid: _badgeStates['Zamknięte'] ?? false,
-                              ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Kraft', 'Nie'),
+                            child: BadgeWidget(
+                              text: 'Nie',
+                              color: Colors.grey,
+                              solid: _filters['Kraft'] == 'false',
                             ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Planowane'),
-                              child: BadgeWidget(
-                                text: 'Planowane',
-                                color: Colors.orange,
-                                solid: _badgeStates['Planowane'] ?? false,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      const ListTile(
-                        title: Text('Kraft'),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Lokalizacja'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Lokalizacja', 'buda'),
+                            child: BadgeWidget(
+                              text: 'Buda',
+                              color: Colors.blue,
+                              solid: _filters['Lokalizacja'] == 'buda',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge('Lokalizacja', 'lokal'),
+                            child: BadgeWidget(
+                              text: 'Lokal',
+                              color: Colors.grey,
+                              solid: _filters['Lokalizacja'] == 'lokal',
+                            ),
+                          ),
+                        ],
                       ),
-                      ListTile(
-                        title: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Kraft'),
-                              child: BadgeWidget(
-                                text: 'Tak',
-                                color: Colors.purple,
-                                solid: _badgeStates['Kraft'] == true,
-                              ),
+                    ),
+                    const Divider(),
+                    const ListTile(
+                      title: Text('Sposoby zamawiania'),
+                    ),
+                    ListTile(
+                      title: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _toggleBadge(
+                              'Sposoby zamawiania',
+                              'własna aplikacja',
                             ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Kraft'),
-                              child: BadgeWidget(
-                                text: 'Nie',
-                                color: Colors.grey,
-                                solid: _badgeStates['Kraft'] == false,
-                              ),
+                            child: BadgeWidget(
+                              text: 'Własna aplikacja',
+                              color: Colors.blue,
+                              solid: _filters['Sposoby zamawiania'] ==
+                                  'własna aplikacja',
                             ),
-                          ],
-                        ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge(
+                              'Sposoby zamawiania',
+                              'przez telefon',
+                            ),
+                            child: BadgeWidget(
+                              text: 'Przez telefon',
+                              color: Colors.blue,
+                              solid: _filters['Sposoby zamawiania'] ==
+                                  'przez telefon',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge(
+                              'Sposoby zamawiania',
+                              'własna strona',
+                            ),
+                            child: BadgeWidget(
+                              text: 'Własna strona',
+                              color: Colors.blue,
+                              solid: _filters['Sposoby zamawiania'] ==
+                                  'własna strona',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleBadge(
+                              'Sposoby zamawiania',
+                              'pyszne.pl',
+                            ),
+                            child: BadgeWidget(
+                              text: 'Pyszne.pl',
+                              color: Colors.blue,
+                              solid:
+                                  _filters['Sposoby zamawiania'] == 'pyszne.pl',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () =>
+                                _toggleBadge('Sposoby zamawiania', 'glovo'),
+                            child: BadgeWidget(
+                              text: 'Glovo',
+                              color: Colors.blue,
+                              solid: _filters['Sposoby zamawiania'] == 'glovo',
+                            ),
+                          ),
+                        ],
                       ),
-                      const ListTile(
-                        title: Text('Lokaliazacja'),
-                      ),
-                      ListTile(
-                        title: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Lokalizacja'),
-                              child: BadgeWidget(
-                                text: 'Buda',
-                                color: Colors.blue,
-                                solid: _badgeStates['Lokalizacja'] == true,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Lokalizacja'),
-                              child: BadgeWidget(
-                                text: 'Lokal',
-                                color: Colors.grey,
-                                solid: _badgeStates['Lokalizacja'] == false,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const ListTile(
-                        title: Text('Czynne'),
-                      ),
-                      ListTile(
-                        title: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Status'),
-                              child: BadgeWidget(
-                                text: 'Otwarte',
-                                color: Colors.green,
-                                solid: _badgeStates['Status'] == true,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Status'),
-                              child: BadgeWidget(
-                                text: 'Zamknięte',
-                                color: Colors.red,
-                                solid: _badgeStates['Status'] == false,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const ListTile(
-                        title: Text('Sposoby zamawiania'),
-                      ),
-                      ListTile(
-                        title: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Własna aplikacja'),
-                              child: BadgeWidget(
-                                text: 'Własna aplikacja',
-                                color: Colors.blue,
-                                solid:
-                                    _badgeStates['Własna aplikacja'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Przez telefon'),
-                              child: BadgeWidget(
-                                text: 'Przez telefon',
-                                color: Colors.blue,
-                                solid: _badgeStates['Przez telefon'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Własna strona'),
-                              child: BadgeWidget(
-                                text: 'Własna strona',
-                                color: Colors.blue,
-                                solid: _badgeStates['Własna strona'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Pyszne.pl'),
-                              child: BadgeWidget(
-                                text: 'Pyszne.pl',
-                                color: Colors.blue,
-                                solid: _badgeStates['Pyszne.pl'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Glovo'),
-                              child: BadgeWidget(
-                                text: 'Glovo',
-                                color: Colors.blue,
-                                solid: _badgeStates['Glovo'] ?? false,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const ListTile(
-                        title: Text('Pokaż wyników'),
-                      ),
-                      ListTile(
-                        title: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _toggleBadge('10'),
-                              child: BadgeWidget(
-                                text: '10',
-                                color: Colors.blue,
-                                solid: _badgeStates['10'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('20'),
-                              child: BadgeWidget(
-                                text: '20',
-                                color: Colors.blue,
-                                solid: _badgeStates['20'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('50'),
-                              child: BadgeWidget(
-                                text: '50',
-                                color: Colors.blue,
-                                solid: _badgeStates['50'] ?? false,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                ListTile(
-                  title: Column(
-                    children: [
-                      const Text('Sortowanie:'),
-                      const ListTile(
-                        title: Text('Według'),
-                      ),
-                      ListTile(
-                        title: Column(
-                          children: [
-                            // data otwarcia, ocena google maps, nazwa, id, data zamknięcia
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Ocena Google Maps'),
-                              child: BadgeWidget(
-                                text: 'Ocena Google Maps',
-                                color: Colors.amber,
-                                solid:
-                                    _badgeStates['Ocena Google Maps'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Nazwa'),
-                              child: BadgeWidget(
-                                text: 'Nazwa',
-                                color: Colors.black,
-                                solid: _badgeStates['Nazwa'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('ID'),
-                              child: BadgeWidget(
-                                text: 'ID',
-                                color: Colors.black,
-                                solid: _badgeStates['ID'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Data otwarcia'),
-                              child: BadgeWidget(
-                                text: 'Data otwarcia',
-                                color: Colors.deepOrangeAccent,
-                                solid: _badgeStates['Data otwarcia'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Data zamknięcia'),
-                              child: BadgeWidget(
-                                text: 'Data zamknięcia',
-                                color: Colors.deepOrangeAccent,
-                                solid: _badgeStates['Data zamknięcia'] ?? false,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const ListTile(
-                        title: Text('Kierunek'),
-                      ),
-                      ListTile(
-                        title: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Rosnąco'),
-                              child: BadgeWidget(
-                                text: 'Rosnąco',
-                                color: Colors.green,
-                                solid: _badgeStates['Rosnąco'] ?? false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBadge('Malejąco'),
-                              child: BadgeWidget(
-                                text: 'Malejąco',
-                                color: Colors.red,
-                                solid: _badgeStates['Malejąco'] ?? false,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
         ),
       ),
       body: _isLoading

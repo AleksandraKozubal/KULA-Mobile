@@ -261,8 +261,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) {
                         return KebabPlaceWidget(
-                          fillingRepository: FillingRepositoryImpl(FillingDataSource(client: http.Client())),
-                          sauceRepository: SauceRepositoryImpl(SauceDataSource(client: http.Client())),
+                          fillingRepository: FillingRepositoryImpl(
+                            FillingDataSource(client: http.Client()),
+                          ),
+                          sauceRepository: SauceRepositoryImpl(
+                            SauceDataSource(client: http.Client()),
+                          ),
                         );
                       },
                       transitionsBuilder:

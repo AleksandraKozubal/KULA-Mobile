@@ -67,6 +67,17 @@ class MockKebabPlaceDataSource extends _i1.Mock
   _i5.Future<Map<String, dynamic>> getKebabPlaces({
     int? page = 1,
     int? paginate,
+    String? fchain,
+    String? fcraft,
+    String? fdatetime,
+    List<int>? ffillings,
+    String? flocation,
+    String? fopen,
+    String? fordering,
+    List<int>? fsauces,
+    String? fstatus,
+    String? sby,
+    String? sdirection,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -75,6 +86,17 @@ class MockKebabPlaceDataSource extends _i1.Mock
           {
             #page: page,
             #paginate: paginate,
+            #fchain: fchain,
+            #fcraft: fcraft,
+            #fdatetime: fdatetime,
+            #ffillings: ffillings,
+            #flocation: flocation,
+            #fopen: fopen,
+            #fordering: fordering,
+            #fsauces: fsauces,
+            #fstatus: fstatus,
+            #sby: sby,
+            #sdirection: sdirection,
           },
         ),
         returnValue:
