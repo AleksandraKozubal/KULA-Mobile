@@ -62,7 +62,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
         } else if (key == 'Sieć' || key == 'Kraft') {
           _filters[key] = value == 'Tak' ? 'true' : 'false';
         } else if (key == 'Otwarte teraz') {
-          _filters['fopen'] = value == 'Tak' ? 'true' : 'false';
+          _filters['fopen'] = value == 'Tak' ? 'open' : 'closed';
         } else if (key == 'Pokaż wyników') {
           _filters['paginate'] = int.parse(value);
         } else if (key == 'fdatetime') {
@@ -72,12 +72,18 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
         }
       }
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _drawerScrollController.jumpTo(_drawerScrollController.offset);
+    });
   }
 
   void _setSort(String sortBy, String direction) {
     setState(() {
       _sortBy = sortBy.toLowerCase();
       _sortDirection = direction.toLowerCase();
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _drawerScrollController.jumpTo(_drawerScrollController.offset);
     });
   }
 
@@ -86,6 +92,9 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
       _filters.clear();
       _timeController.clear();
       _selectedDay = null;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _drawerScrollController.jumpTo(_drawerScrollController.offset);
     });
   }
 
@@ -268,7 +277,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             runSpacing: 8.0,
                             children: [
                               GestureDetector(
-                                onTap: () => _toggleBadge('Pokaż wyników', '10'),
+                                onTap: () =>
+                                    _toggleBadge('Pokaż wyników', '10'),
                                 child: BadgeWidget(
                                   text: '10',
                                   color: Colors.blue,
@@ -276,7 +286,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () => _toggleBadge('Pokaż wyników', '20'),
+                                onTap: () =>
+                                    _toggleBadge('Pokaż wyników', '20'),
                                 child: BadgeWidget(
                                   text: '20',
                                   color: Colors.blue,
@@ -284,7 +295,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () => _toggleBadge('Pokaż wyników', '50'),
+                                onTap: () =>
+                                    _toggleBadge('Pokaż wyników', '50'),
                                 child: BadgeWidget(
                                   text: '50',
                                   color: Colors.blue,
@@ -307,7 +319,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             runSpacing: 8.0,
                             children: [
                               GestureDetector(
-                                onTap: () => _setSort('google_maps_rating', 'asc'),
+                                onTap: () =>
+                                    _setSort('google_maps_rating', 'asc'),
                                 child: BadgeWidget(
                                   text: 'Ocena Google Maps',
                                   color: Colors.amber,
@@ -386,9 +399,11 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                         ListTile(
                           title: const Text('Składniki'),
                           trailing: IconButton(
-                            icon: Icon(_showFillings
-                                ? Icons.expand_less
-                                : Icons.expand_more),
+                            icon: Icon(
+                              _showFillings
+                                  ? Icons.expand_less
+                                  : Icons.expand_more,
+                            ),
                             onPressed: () {
                               setState(() {
                                 _showFillings = !_showFillings;
@@ -408,7 +423,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                 value: (_filters['Składniki'] as List?)
                                         ?.contains(entry.key) ??
                                     false,
-                                onChanged: (bool? value) {
+                                onChanged: (value) {
                                   _toggleBadge('Składniki', entry.key);
                                 },
                               );
@@ -418,9 +433,11 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                         ListTile(
                           title: const Text('Sosy'),
                           trailing: IconButton(
-                            icon: Icon(_showSauces
-                                ? Icons.expand_less
-                                : Icons.expand_more),
+                            icon: Icon(
+                              _showSauces
+                                  ? Icons.expand_less
+                                  : Icons.expand_more,
+                            ),
                             onPressed: () {
                               setState(() {
                                 _showSauces = !_showSauces;
@@ -440,7 +457,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                 value: (_filters['Sosy'] as List?)
                                         ?.contains(entry.key) ??
                                     false,
-                                onChanged: (bool? value) {
+                                onChanged: (value) {
                                   _toggleBadge('Sosy', entry.key);
                                 },
                               );
@@ -492,7 +509,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () => _toggleBadge('Status', 'Zamknięte'),
+                                onTap: () =>
+                                    _toggleBadge('Status', 'Zamknięte'),
                                 child: BadgeWidget(
                                   text: 'Zamknięte',
                                   color: Colors.red,
@@ -500,7 +518,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () => _toggleBadge('Status', 'Planowane'),
+                                onTap: () =>
+                                    _toggleBadge('Status', 'Planowane'),
                                 child: BadgeWidget(
                                   text: 'Planowane',
                                   color: Colors.orange,
@@ -520,29 +539,33 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             runSpacing: 8.0,
                             children: [
                               GestureDetector(
-                                onTap: () => _toggleBadge('Otwarte teraz', 'Tak'),
+                                onTap: () =>
+                                    _toggleBadge('Otwarte teraz', 'Tak'),
                                 child: BadgeWidget(
                                   text: 'Tak',
                                   color: Colors.green,
-                                  solid: _filters['fopen'] == 'true',
+                                  solid: _filters['fopen'] == 'open',
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () => _toggleBadge('Otwarte teraz', 'Nie'),
+                                onTap: () =>
+                                    _toggleBadge('Otwarte teraz', 'Nie'),
                                 child: BadgeWidget(
                                   text: 'Nie',
                                   color: Colors.red,
-                                  solid: _filters['fopen'] == 'false',
+                                  solid: _filters['fopen'] == 'closed',
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        if (_filters['fopen'] == 'true') ...[
+                        if (_filters['fopen'] == 'open') ...[
                           const Divider(),
                           ListTile(
-                            title: const Text('Filtruj według dnia tygodnia i godziny'),
-                            subtitle: const Text('Wybierz dzień tygodnia i godzinę'),
+                            title: const Text(
+                                'Filtruj według dnia tygodnia i godziny'),
+                            subtitle:
+                                const Text('Wybierz dzień tygodnia i godzinę'),
                             trailing: IconButton(
                               icon: const Icon(Icons.clear),
                               onPressed: () {
@@ -555,7 +578,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
                             child: DropdownButtonFormField<String>(
                               value: _selectedDay,
                               decoration: const InputDecoration(
@@ -563,13 +587,20 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                 border: OutlineInputBorder(),
                               ),
                               items: const [
-                                DropdownMenuItem(value: '0', child: Text('Poniedziałek')),
-                                DropdownMenuItem(value: '1', child: Text('Wtorek')),
-                                DropdownMenuItem(value: '2', child: Text('Środa')),
-                                DropdownMenuItem(value: '3', child: Text('Czwartek')),
-                                DropdownMenuItem(value: '4', child: Text('Piątek')),
-                                DropdownMenuItem(value: '5', child: Text('Sobota')),
-                                DropdownMenuItem(value: '6', child: Text('Niedziela')),
+                                DropdownMenuItem(
+                                    value: '0', child: Text('Poniedziałek')),
+                                DropdownMenuItem(
+                                    value: '1', child: Text('Wtorek')),
+                                DropdownMenuItem(
+                                    value: '2', child: Text('Środa')),
+                                DropdownMenuItem(
+                                    value: '3', child: Text('Czwartek')),
+                                DropdownMenuItem(
+                                    value: '4', child: Text('Piątek')),
+                                DropdownMenuItem(
+                                    value: '5', child: Text('Sobota')),
+                                DropdownMenuItem(
+                                    value: '6', child: Text('Niedziela')),
                               ],
                               onChanged: (value) {
                                 setState(() {
@@ -581,7 +612,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                           ),
                           const SizedBox(height: 8),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
                             child: TextField(
                               controller: _timeController,
                               decoration: const InputDecoration(
@@ -632,7 +664,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                             runSpacing: 8.0,
                             children: [
                               GestureDetector(
-                                onTap: () => _toggleBadge('Lokalizacja', 'buda'),
+                                onTap: () =>
+                                    _toggleBadge('Lokalizacja', 'buda'),
                                 child: BadgeWidget(
                                   text: 'Buda',
                                   color: Colors.blue,
@@ -640,7 +673,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () => _toggleBadge('Lokalizacja', 'lokal'),
+                                onTap: () =>
+                                    _toggleBadge('Lokalizacja', 'lokal'),
                                 child: BadgeWidget(
                                   text: 'Lokal',
                                   color: Colors.grey,
@@ -713,7 +747,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                                 child: BadgeWidget(
                                   text: 'Glovo',
                                   color: Colors.blue,
-                                  solid: _filters['Sposoby zamawiania'] == 'glovo',
+                                  solid:
+                                      _filters['Sposoby zamawiania'] == 'glovo',
                                 ),
                               ),
                             ],
