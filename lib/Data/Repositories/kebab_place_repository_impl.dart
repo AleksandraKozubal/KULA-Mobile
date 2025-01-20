@@ -9,8 +9,33 @@ class KebabPlaceRepositoryImpl {
   Future<Map<String, dynamic>> getKebabPlaces({
     required int page,
     int? paginate,
+    String? fchain,
+    String? fcraft,
+    String? fdatetime,
+    List<int>? ffillings,
+    String? flocation,
+    String? fopen,
+    String? fordering,
+    List<int>? fsauces,
+    String? fstatus,
+    String? sby,
+    String? sdirection,
   }) async {
-    return await _dataSource.getKebabPlaces(page: page, paginate: paginate);
+    return await _dataSource.getKebabPlaces(
+      page: page,
+      paginate: paginate,
+      fchain: fchain,
+      fcraft: fcraft,
+      fdatetime: fdatetime,
+      ffillings: ffillings,
+      flocation: flocation,
+      fopen: fopen,
+      fordering: fordering,
+      fsauces: fsauces,
+      fstatus: fstatus,
+      sby: sby,
+      sdirection: sdirection,
+    );
   }
 
   Future<KebabPlaceModel> getKebabPlace(int id) async {

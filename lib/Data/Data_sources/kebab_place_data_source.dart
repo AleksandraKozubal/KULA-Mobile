@@ -23,7 +23,6 @@ class KebabPlaceDataSource {
     String? fstatus,
     String? sby,
     String? sdirection,
-
   }) async {
     var url = '$apiUrl/kebab-places?page=$page';
     if (paginate != null) {
