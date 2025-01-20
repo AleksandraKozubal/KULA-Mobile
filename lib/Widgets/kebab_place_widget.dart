@@ -563,7 +563,8 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                           const Divider(),
                           ListTile(
                             title: const Text(
-                                'Filtruj według dnia tygodnia i godziny'),
+                              'Filtruj według dnia tygodnia i godziny',
+                            ),
                             subtitle:
                                 const Text('Wybierz dzień tygodnia i godzinę'),
                             trailing: IconButton(
@@ -588,19 +589,33 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                               ),
                               items: const [
                                 DropdownMenuItem(
-                                    value: '0', child: Text('Poniedziałek')),
+                                  value: '0',
+                                  child: Text('Poniedziałek'),
+                                ),
                                 DropdownMenuItem(
-                                    value: '1', child: Text('Wtorek')),
+                                  value: '1',
+                                  child: Text('Wtorek'),
+                                ),
                                 DropdownMenuItem(
-                                    value: '2', child: Text('Środa')),
+                                  value: '2',
+                                  child: Text('Środa'),
+                                ),
                                 DropdownMenuItem(
-                                    value: '3', child: Text('Czwartek')),
+                                  value: '3',
+                                  child: Text('Czwartek'),
+                                ),
                                 DropdownMenuItem(
-                                    value: '4', child: Text('Piątek')),
+                                  value: '4',
+                                  child: Text('Piątek'),
+                                ),
                                 DropdownMenuItem(
-                                    value: '5', child: Text('Sobota')),
+                                  value: '5',
+                                  child: Text('Sobota'),
+                                ),
                                 DropdownMenuItem(
-                                    value: '6', child: Text('Niedziela')),
+                                  value: '6',
+                                  child: Text('Niedziela'),
+                                ),
                               ],
                               onChanged: (value) {
                                 setState(() {
