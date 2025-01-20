@@ -27,7 +27,29 @@ Create .env from example .env (for Android local development use http://10.0.2.2
 cp .env.example .env
 ```
 
-Useful commands: 
+Run command:
+```
+flutter run
+```
+
+## Application deployment
+
+### Android .apk deployment
+
+- Use command:
+```
+flutter build apk --split-per-abi
+```
+- Upload proper .apk to your device and install it.
+
+### iOS deployment
+
+(*Requires Apple Developer Account*)
+
+- Follow official flutter documentation:
+https://docs.flutter.dev/deployment/ios
+
+## Useful commands: 
 - To check if your project is setup properly use:
 ```shell
 flutter doctor 
