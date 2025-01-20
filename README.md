@@ -14,6 +14,8 @@ KULA-Mobile is a mobile application designed to help users locate and explore ke
 - **Visual Studio Code or preffered IDE** 
 - Android Studio (optional)
 
+*iOS development requires MacOS device*
+
 2. Installation
 
 - Reffering to docs: https://docs.flutter.dev/get-started/install
