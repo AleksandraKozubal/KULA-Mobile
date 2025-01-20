@@ -93,6 +93,7 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
       _filters.clear();
       _timeController.clear();
       _selectedDay = null;
+      _fetchKebabPlaces();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _drawerScrollController.jumpTo(_drawerScrollController.offset);
@@ -199,12 +200,40 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
   }
 
   void _updateDateTimeFilter() {
+    final timePattern = RegExp(r'^([01]\d|2[0-3]):([0-5]\d)$');
     if (_selectedDay != null && _timeController.text.isNotEmpty) {
-      _toggleBadge('fdatetime', '$_selectedDay-${_timeController.text}');
+      if (timePattern.hasMatch(_timeController.text)) {
+        _toggleBadge('fdatetime', '$_selectedDay-${_timeController.text}');
+      } else {
+        return ;
+      }
     }
   }
 
+  void _showInvalidTimeFormatDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Nieprawidłowy format czasu'),
+          content: const Text('Proszę użyć formatu HH:MM w zakresie od 00:00 do 23:59.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _applyFilters() {
+    final timePattern = RegExp(r'^([01]\d|2[0-3]):([0-5]\d)$');
+    if (_selectedDay != null && _timeController.text.isNotEmpty && !timePattern.hasMatch(_timeController.text)) {
+      _showInvalidTimeFormatDialog();
+      return;
+    }
     _fetchKebabPlaces();
     Navigator.of(context).pop();
   }
