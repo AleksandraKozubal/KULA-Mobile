@@ -589,31 +589,31 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                               ),
                               items: const [
                                 DropdownMenuItem(
-                                  value: '0',
+                                  value: '1',
                                   child: Text('Poniedziałek'),
                                 ),
                                 DropdownMenuItem(
-                                  value: '1',
+                                  value: '2',
                                   child: Text('Wtorek'),
                                 ),
                                 DropdownMenuItem(
-                                  value: '2',
+                                  value: '3',
                                   child: Text('Środa'),
                                 ),
                                 DropdownMenuItem(
-                                  value: '3',
+                                  value: '4',
                                   child: Text('Czwartek'),
                                 ),
                                 DropdownMenuItem(
-                                  value: '4',
+                                  value: '5',
                                   child: Text('Piątek'),
                                 ),
                                 DropdownMenuItem(
-                                  value: '5',
+                                  value: '6',
                                   child: Text('Sobota'),
                                 ),
                                 DropdownMenuItem(
-                                  value: '6',
+                                  value: '7',
                                   child: Text('Niedziela'),
                                 ),
                               ],
