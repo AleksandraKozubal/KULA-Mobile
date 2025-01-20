@@ -653,6 +653,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                     return BadgeWidget(
                                       text: fillingName,
                                       color: fillingColor,
+                                      solid: true,
                                     );
                                   }).toList(),
                                 ),
@@ -704,6 +705,7 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                                     return BadgeWidget(
                                       text: sauceName,
                                       color: sauceColor,
+                                      solid: true,
                                     );
                                   }).toList(),
                                 ),
