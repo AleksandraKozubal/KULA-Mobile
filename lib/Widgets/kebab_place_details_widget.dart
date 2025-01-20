@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:kula_mobile/Data/Data_sources/login_data_source.dart';
 import 'package:kula_mobile/Data/Data_sources/logout_data_source.dart';
@@ -333,6 +335,19 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Center(
+                      child: widget.kebabPlace.image != null
+                          ? Image.memory(
+                              base64Decode(
+                                widget.kebabPlace.image!.split(',').last,
+                              ),
+                              width: 200.0,
+                              height: 200.0,
+                              fit: BoxFit.cover,
+                            )
+                          : const Icon(Icons.fastfood, size: 50.0),
+                    ),
+                    const SizedBox(height: 16),
                     Text(
                       widget.kebabPlace.name,
                       style: const TextStyle(
@@ -366,7 +381,9 @@ class KebabPlaceDetailsWidgetState extends State<KebabPlaceDetailsWidget> {
                         ],
                       ),
                     const SizedBox(height: 8),
-                    Row(
+                    Wrap(
+                      spacing: 4.0,
+                      runSpacing: 4.0,
                       children: [
                         if (widget.kebabPlace.isCraft == true) ...[
                           const BadgeWidget(

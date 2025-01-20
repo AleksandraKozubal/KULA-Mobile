@@ -10,6 +10,7 @@ import 'package:kula_mobile/Widgets/kebab_place_details_widget.dart';
 import 'package:kula_mobile/Data/Data_sources/filling_data_source.dart';
 import 'package:kula_mobile/Data/Data_sources/sauce_data_source.dart';
 import 'badge_widget.dart';
+import 'dart:convert';
 
 class KebabPlaceWidget extends StatefulWidget {
   final FillingRepositoryImpl fillingRepository;
@@ -803,7 +804,16 @@ class KebabPlaceWidgetState extends State<KebabPlaceWidget> {
                     itemBuilder: (context, index) {
                       final kebabPlace = _kebabPlaces[index];
                       return ListTile(
-                        leading: const Icon(Icons.fastfood, size: 50.0),
+                        leading: kebabPlace.image != null
+                            ? Image.memory(
+                                base64Decode(
+                                  kebabPlace.image!.split(',').last,
+                                ),
+                                width: 75.0,
+                                height: 75.0,
+                                fit: BoxFit.cover,
+                              )
+                            : const Icon(Icons.fastfood, size: 50.0),
                         title: Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Text(
